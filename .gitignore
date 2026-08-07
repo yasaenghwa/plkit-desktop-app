@@ -1,0 +1,16 @@
+node_modules/
+out/
+dist/
+coverage/
+.vite/
+.codegraph/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+Thumbs.db
+Desktop.ini

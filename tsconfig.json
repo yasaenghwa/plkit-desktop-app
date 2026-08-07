@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/renderer/app/*"],
+      "@pages/*": ["src/renderer/pages/*"],
+      "@widgets/*": ["src/renderer/widgets/*"],
+      "@features/*": ["src/renderer/features/*"],
+      "@entities/*": ["src/renderer/entities/*"],
+      "@shared/*": ["src/renderer/shared/*"]
+    },
+    "types": ["node", "vite/client"]
+  },
+  "include": ["electron.vite.config.ts", "src"]
+}
