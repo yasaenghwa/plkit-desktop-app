@@ -17,14 +17,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
-      "@app/*": ["src/renderer/app/*"],
-      "@pages/*": ["src/renderer/pages/*"],
-      "@widgets/*": ["src/renderer/widgets/*"],
-      "@features/*": ["src/renderer/features/*"],
-      "@entities/*": ["src/renderer/entities/*"],
-      "@shared/*": ["src/renderer/shared/*"]
+      "@app/*": ["./src/renderer/app/*"],
+      "@pages/*": ["./src/renderer/pages/*"],
+      "@widgets/*": ["./src/renderer/widgets/*"],
+      "@features/*": ["./src/renderer/features/*"],
+      "@entities/*": ["./src/renderer/entities/*"],
+      "@shared/*": ["./src/renderer/shared/*"]
     },
     "types": ["node", "vite/client"]
   },
