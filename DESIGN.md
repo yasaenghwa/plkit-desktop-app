@@ -10,7 +10,7 @@
 
 | 역할 | CSS 토큰 | 값 | 원본 출처 | 용도 |
 | --- | --- | --- | --- | --- |
-| Canvas | `--plkit-canvas` | `#141219` | 15, 27–28행 | 앱 바깥과 고정 셸 |
+| Canvas | `--plkit-canvas` | `#141219` | 15, 27–28행 | 앱 전체 배경 |
 | Chrome surface | `--plkit-chrome` | `rgba(33, 30, 37, 0.9)` | 29, 582행 | 상·하단 바 |
 | Sidebar surface | `--plkit-sidebar` | `rgba(33, 30, 37, 0.55)` | 46행 | 좌측 내비게이션 |
 | Panel surface | `--plkit-panel` | `rgba(54, 52, 59, 0.4)` | 69행 외 반복 | 카드와 패널 |
@@ -29,9 +29,6 @@
 | Status success | `--plkit-success` | `#45dfa4` | 41, 681행 | 정상·온라인·성공 |
 | Status danger | `--plkit-danger` | `#ffb4ab` | 37, 681행 | 경고·오프라인·실패 |
 | Status warning | `--plkit-warning` | `#febc2e` | 32, 837행 | WARN 로그 |
-| Window close | `--plkit-window-close` | `#ff736a` | 31행 | 창 장식 |
-| Window minimize | `--plkit-window-minimize` | `#febc2e` | 32행 | 창 장식 |
-| Window maximize | `--plkit-window-maximize` | `#19c332` | 33행 | 창 장식 |
 
 색상 알파 변형은 위 역할의 `rgb()` 채널을 사용한 원본 값만 허용합니다. 컴포넌트에 라임 `#a8ff3e`, `#82d51f`, 임의 보라 `#9a7cff`, 임의 파랑 `#62b7ff`를 사용하지 않습니다.
 
@@ -56,17 +53,15 @@
 ## 4. 간격과 레이아웃
 
 - 기준 단위는 2px이며 원본에서 반복되는 간격은 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 34px입니다.
-- 바깥 stage는 화면 중앙에 `1440×920px` 셸을 배치합니다. 스케일은 `min((innerWidth - 32) / 1440, (innerHeight - 32) / 920, 1)`입니다 (원본 28, 639행).
-- 상단 바는 44px, 사이드바는 224px, 하단 상태 바는 34px입니다.
-- 상단 바와 사이드바는 고정되고, `26px 30px 34px` 패딩을 가진 콘텐츠 본문만 세로 스크롤합니다.
-- 셸은 모바일 재배치하지 않습니다. 좁은 화면에서도 원본처럼 전체 1440×920 구성을 비율 축소합니다.
+- 앱은 Electron 콘텐츠 영역의 너비와 높이를 모두 사용합니다.
+- 사이드바는 224px, 하단 상태 바는 34px입니다.
+- 사이드바는 고정되고, `26px 30px 34px` 패딩을 가진 콘텐츠 본문만 세로 스크롤합니다.
 - 표준 패널 반경은 16px, 내부 행은 12px, 입력은 10px, 선택·CTA는 999px입니다.
 
 ## 5. 컴포넌트
 
 ### GatewayShell
-- **구조**: stage → 1440×920 shell → 44px topbar + (224px sidebar + content/footer).
-- **상태**: 크기 변경 시 scale만 갱신합니다.
+- **구조**: stage → 전체 화면 shell → 224px sidebar + content/footer.
 - **레이아웃/스크롤**: 콘텐츠 본문만 scroll owner입니다.
 
 ### NavigationItem
@@ -109,7 +104,7 @@
 
 ## 7. 깊이와 표면
 
-혼합 전략을 사용합니다. 표준 패널은 반투명 tonal shift + 1px 경계선 + 작은 2단 그림자, 셸은 `0 40px 90px rgba(0,0,0,.6)`, 모달과 toast는 라벤더 glow를 사용합니다. 원본에 없는 대형 카드 그림자나 라임 glow를 추가하지 않습니다.
+혼합 전략을 사용합니다. 표준 패널은 반투명 tonal shift + 1px 경계선 + 작은 2단 그림자를 사용하고, 모달과 toast는 라벤더 glow를 사용합니다. 원본에 없는 대형 카드 그림자나 라임 glow를 추가하지 않습니다.
 
 ## 8. 접근성 제약과 허용 부채
 
@@ -123,6 +118,5 @@
 
 | 항목 | 위치 | 이유 | 종료 조건 |
 | --- | --- | --- | --- |
-| 1440×920 고정 셸 축소 | 전체 앱 | 원본과 동일한 출력이 이번 이관의 최우선 계약 | 별도 반응형 디자인 요청 시 |
 | 카메라 이미지 placeholder | Overview / Camera / History | 원본도 런타임 `image-slot`에 외부 이미지가 주입되지 않으면 placeholder를 사용 | 실제 카메라 API 연결 시 |
 | 데모 데이터와 타이머 | Control / Camera / Sync / Assistant | 원본의 데모 상호작용을 동일하게 이관 | 실제 Gateway API 연결 시 |

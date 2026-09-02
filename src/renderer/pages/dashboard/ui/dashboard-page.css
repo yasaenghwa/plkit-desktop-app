@@ -12,81 +12,26 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: radial-gradient(1200px 700px at 70% -10%, rgb(56 19 133 / 35%), rgb(20 18 25 / 0%) 60%), var(--plkit-canvas);
+  background: var(--plkit-canvas);
 }
 
 .dashboard-shell {
   display: flex;
-  width: 1440px;
-  height: 920px;
+  width: 100%;
+  height: 100%;
   flex: 0 0 auto;
   flex-direction: column;
   overflow: hidden;
-  transform-origin: center;
-  border: 1px solid rgb(255 255 255 / 8%);
-  border-radius: 18px;
   background: var(--plkit-canvas);
-  box-shadow: 0 40px 90px rgb(0 0 0 / 60%);
 }
 
-.topbar {
-  display: flex;
-  height: 44px;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 14px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--plkit-border);
-  background: var(--plkit-chrome);
-}
-
-.window-lights { display: flex; align-items: center; gap: 8px; }
-.window-lights span { width: 12px; height: 12px; border-radius: 50%; }
-.window-lights span:nth-child(1) { background: var(--plkit-window-close); }
-.window-lights span:nth-child(2) { background: var(--plkit-window-minimize); }
-.window-lights span:nth-child(3) { background: var(--plkit-window-maximize); }
-.window-title { color: var(--plkit-text-muted); font-size: 12px; font-weight: 500; }
-.topbar__status { display: flex; align-items: center; gap: 12px; margin-left: auto; color: var(--plkit-text-muted); font-size: 12px; font-weight: 500; }
-.topbar__status time { font-variant-numeric: tabular-nums; }
-
-.notification-button {
-  position: relative;
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--plkit-text-muted);
-  cursor: pointer;
-}
-.notification-button:hover { background: var(--plkit-accent-15); }
-.notification-button svg, .sidebar svg, .page-title svg, .image-slot svg, .monitoring-card svg, .environment-metric svg, .chat-panel svg {
+.sidebar svg, .page-title svg, .image-slot svg, .monitoring-card svg, .environment-metric svg, .chat-panel svg {
   fill: none;
   stroke: currentcolor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
 }
-.notification-button > span {
-  position: absolute;
-  top: 0;
-  right: -2px;
-  display: grid;
-  min-width: 14px;
-  height: 14px;
-  place-items: center;
-  padding: 0 3px;
-  border-radius: 999px;
-  background: var(--plkit-danger);
-  color: var(--plkit-canvas);
-  font-size: 9px;
-  font-weight: 700;
-}
-.gateway-online { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px; background: var(--plkit-success-12); color: var(--plkit-success); font-size: 11px; font-weight: 600; }
-.gateway-online > span { width: 6px; height: 6px; border-radius: 50%; background: currentcolor; }
 
 .dashboard-body { display: flex; min-height: 0; flex: 1; }
 .sidebar {

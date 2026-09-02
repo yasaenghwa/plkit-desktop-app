@@ -12,10 +12,6 @@ import { SystemSection } from './system-section';
 import { Icon } from './dashboard-primitives';
 import './dashboard-page.css';
 
-const BELL = 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9 M10.3 21a1.94 1.94 0 0 0 3.4 0';
-
-const formatClock = (date: Date): string => date.toTimeString().slice(0, 5);
-
 type DashboardContentProps = {
   readonly historyTab: HistoryTab;
   readonly notify: (message: string) => void;
@@ -68,22 +64,8 @@ export const DashboardPage = (): JSX.Element => {
   const [route, setRoute] = useState<RouteId>('overview');
   const [historyTab, setHistoryTab] = useState<HistoryTab>('Sensor');
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
-  const [clock, setClock] = useState(() => formatClock(new Date()));
   const [toast, setToast] = useState<string | null>(null);
-  const [scale, setScale] = useState(1);
   const mainRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const tick = (): void => setClock(formatClock(new Date()));
-    const fit = (): void => setScale(Math.min((window.innerWidth - 32) / 1440, (window.innerHeight - 32) / 920, 1));
-    const timer = window.setInterval(tick, 30_000);
-    window.addEventListener('resize', fit);
-    fit();
-    return () => {
-      window.clearInterval(timer);
-      window.removeEventListener('resize', fit);
-    };
-  }, []);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -99,24 +81,7 @@ export const DashboardPage = (): JSX.Element => {
 
   return (
     <div className="dashboard-stage">
-      <div className="dashboard-shell" style={{ transform: `scale(${scale})` }}>
-        <header className="topbar">
-          <div className="window-lights" aria-hidden="true"><span /><span /><span /></div>
-          <span className="window-title">PLKIT Gateway — Electron</span>
-          <div className="topbar__status">
-            <button
-              aria-label="Open event history"
-              className="notification-button"
-              onClick={() => {
-                setHistoryTab('Event');
-                navigate('history');
-              }}
-              type="button"
-            ><Icon path={BELL} size={16} /><span>1</span></button>
-            <span className="gateway-online"><span />Gateway Online</span>
-            <time>{clock}</time>
-          </div>
-        </header>
+      <div className="dashboard-shell">
         <div className="dashboard-body">
           <aside className="sidebar">
             <button className="brand" onClick={() => navigate('overview')} type="button"><strong>PLKIT</strong><small>GATEWAY · RASPBERRY PI</small></button>
