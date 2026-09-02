@@ -5,6 +5,7 @@ out/
 dist/
 coverage/
 .vite/
+.omo/
 .codegraph/
 *.log
 npm-debug.log*

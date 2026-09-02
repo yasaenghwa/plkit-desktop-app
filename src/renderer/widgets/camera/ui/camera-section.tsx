@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { DataRows, ImageSlot, PageTitle, Panel } from './dashboard-primitives';
+import { DataRows, ImageSlot, PageTitle, Panel } from '@shared/ui';
 
 const TIMELINE_DAYS = [
   { day: 1, date: '2026-08-06' },

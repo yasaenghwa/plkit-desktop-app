@@ -1,4 +1,15 @@
-import type { RouteId } from './dashboard-data';
+export const ROUTE_IDS = [
+  'overview',
+  'devices',
+  'monitoring',
+  'control',
+  'camera',
+  'history',
+  'system',
+  'assistant',
+] as const;
+
+export type RouteId = (typeof ROUTE_IDS)[number];
 
 type NavigationItem = {
   readonly id: RouteId;

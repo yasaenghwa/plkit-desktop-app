@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 
-import { Icon, PageTitle, Panel, StatusBadge } from './dashboard-primitives';
+import { Icon, PageTitle, Panel, StatusBadge } from '@shared/ui';
 
 const SPARKLE = 'M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z';
 const SEND = 'M22 2 11 13 M22 2 15 22l-4-9-9-4Z';

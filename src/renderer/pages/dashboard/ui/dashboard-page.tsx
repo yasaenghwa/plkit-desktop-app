@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 
-import type { RouteId } from '../model/dashboard-data';
-import { NAVIGATION_ITEMS } from '../model/dashboard-navigation';
-import { AssistantSection } from './assistant-section';
-import { CameraSection } from './camera-assistant-section';
-import { ControlSection } from './control-section';
-import { DevicesSection } from './devices-section';
-import { HistorySection, type HistoryTab } from './history-section';
-import { MonitoringSection, OverviewSection } from './overview-section';
-import { SystemSection } from './system-section';
-import { Icon } from './dashboard-primitives';
+import { Icon } from '@shared/ui';
+import { AssistantSection } from '@widgets/assistant';
+import { CameraSection } from '@widgets/camera';
+import { ControlSection } from '@widgets/control';
+import { DevicesSection } from '@widgets/devices';
+import { HistorySection } from '@widgets/history';
+import type { HistoryTab } from '@widgets/history';
+import { MonitoringSection } from '@widgets/monitoring';
+import { OverviewSection } from '@widgets/overview';
+import { SystemSection } from '@widgets/system';
+
+import { NAVIGATION_ITEMS, type RouteId } from '../model/dashboard-navigation';
 import './dashboard-page.css';
 
 type DashboardContentProps = {
@@ -33,7 +35,15 @@ const DashboardContent = ({
 }: DashboardContentProps): JSX.Element => {
   switch (route) {
     case 'overview':
-      return <OverviewSection onNavigate={onNavigate} onSelectSensor={(id) => onSelectSensor(id)} />;
+      return (
+        <OverviewSection
+          onOpenCamera={() => onNavigate('camera')}
+          onOpenControl={() => onNavigate('control')}
+          onOpenHistory={() => onNavigate('history')}
+          onOpenMonitoring={() => onNavigate('monitoring')}
+          onSelectSensor={(id) => onSelectSensor(id)}
+        />
+      );
     case 'devices':
       return <DevicesSection notify={notify} />;
     case 'monitoring':

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
-import { DEVICES } from '../model/dashboard-data';
-import { DataRows, PageTitle, Panel, SegmentedControl, StatusBadge } from './dashboard-primitives';
+import { DEVICES } from '@entities/farm';
+import { DataRows, PageTitle, Panel, SegmentedControl, StatusBadge } from '@shared/ui';
 
 const DEVICE_FILTERS = ['All', 'Sensor', 'Actuator', 'Camera'] as const;
 type DeviceFilter = (typeof DEVICE_FILTERS)[number];

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { PageTitle, Panel } from './dashboard-primitives';
+import { PageTitle, Panel } from '@shared/ui';
 
 const ACTUATORS = [
   { id: 'pump', name: 'Water Pump', deviceId: 'pump-001', note: '무제한 ON 방지를 위해 실제 state 수신 후 상태를 확정합니다.', last: 'OFF / SUCCESS / 15:29' },

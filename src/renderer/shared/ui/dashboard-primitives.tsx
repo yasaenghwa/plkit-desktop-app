@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { StatusTone } from '../model/dashboard-data';
+export type StatusTone = 'accent' | 'danger' | 'info' | 'muted' | 'success';
 
 type PanelProps = {
   readonly children: ReactNode;

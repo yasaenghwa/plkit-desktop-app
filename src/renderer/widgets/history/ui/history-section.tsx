@@ -1,5 +1,5 @@
-import { CHART_POINTS } from '../model/dashboard-data';
-import { LineChart, PageTitle, Panel, SegmentedControl } from './dashboard-primitives';
+import { CHART_POINTS } from '@entities/farm';
+import { LineChart, PageTitle, Panel, SegmentedControl } from '@shared/ui';
 
 const HISTORY_TABS = ['Sensor', 'Actuator', 'Camera', 'Event'] as const;
 export type HistoryTab = (typeof HISTORY_TABS)[number];

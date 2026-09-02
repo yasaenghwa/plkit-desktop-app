@@ -1,18 +1,3 @@
-export const ROUTE_IDS = [
-  'overview',
-  'devices',
-  'monitoring',
-  'control',
-  'camera',
-  'history',
-  'system',
-  'assistant',
-] as const;
-
-export type RouteId = (typeof ROUTE_IDS)[number];
-
-export type StatusTone = 'accent' | 'danger' | 'info' | 'muted' | 'success';
-
 export type Sensor = {
   readonly id: string;
   readonly name: string;
@@ -191,17 +176,6 @@ export const DEVICES: readonly Device[] = [
     description: '3시간 간격 생장 촬영',
   },
 ];
-
-export const RECENT_EVENTS = [
-  { time: '15:31', message: 'Soil sensor telemetry received (core-001)', tone: 'success' },
-  { time: '15:29', message: 'Pump command completed — SUCCESS', tone: 'accent' },
-  { time: '15:00', message: 'Growth image captured (growth-cam-001)', tone: 'info' },
-  { time: '14:47', message: 'fan-001 health WARNING — slow response', tone: 'danger' },
-] as const satisfies readonly {
-  readonly time: string;
-  readonly message: string;
-  readonly tone: StatusTone;
-}[];
 
 export const CHART_POINTS =
   '0,124 30,118 60,121 90,110 120,112 150,102 180,108 210,98 240,105 270,94 300,101 330,88 360,96 390,83 420,90 450,78 480,86 510,74 540,82 570,68 600,75 630,62 660,70 690,58 720,64';

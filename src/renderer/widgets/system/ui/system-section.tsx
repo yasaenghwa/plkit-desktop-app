@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { DataRows, PageTitle, Panel, SegmentedControl } from './dashboard-primitives';
+import { DataRows, PageTitle, Panel, SegmentedControl } from '@shared/ui';
 
 const SYSTEM_TABS = ['Gateway', 'Network', 'MQTT', 'Central Sync', 'Logs'] as const;
 type SystemTab = (typeof SYSTEM_TABS)[number];
