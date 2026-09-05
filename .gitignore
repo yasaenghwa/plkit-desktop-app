@@ -1,11 +1,8 @@
 node_modules/
-개인폴더/
-docs/
 out/
 dist/
 coverage/
 .vite/
-.omo/
 .codegraph/
 *.log
 npm-debug.log*
@@ -17,4 +14,3 @@ pnpm-debug.log*
 *.tsbuildinfo
 Thumbs.db
 Desktop.ini
-

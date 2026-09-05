@@ -3,12 +3,10 @@ import { join } from 'node:path';
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
-    width: 1512,
-    height: 960,
-    useContentSize: true,
+    width: 1200,
+    height: 760,
     minWidth: 960,
     minHeight: 640,
-    autoHideMenuBar: true,
     show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
