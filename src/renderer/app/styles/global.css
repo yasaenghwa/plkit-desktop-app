@@ -1,44 +1,59 @@
 :root {
-  color: var(--color-text-primary);
-  background: var(--color-canvas);
-  font-family: 'Segoe UI Variable', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  color: var(--plkit-text);
+  background: var(--plkit-canvas);
+  font-family: Inter, 'Malgun Gothic', sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  --color-canvas: #f6f8f5;
-  --color-surface: #ffffff;
-  --color-surface-muted: #edf2ec;
-  --color-text-primary: #10251e;
-  --color-text-secondary: #53635c;
-  --color-border: #dce5de;
-  --color-accent: #16794a;
-  --color-accent-soft: #dff2e7;
-  --shadow-panel: 0 18px 45px rgb(20 53 37 / 10%);
-  --radius-panel: 20px;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --font-size-label: 0.75rem;
-  --font-size-body: 1rem;
-  --font-size-title: clamp(2.25rem, 6vw, 4rem);
+  --plkit-canvas: #141219;
+  --plkit-chrome: rgb(33 30 37 / 90%);
+  --plkit-sidebar: rgb(33 30 37 / 55%);
+  --plkit-panel: rgb(54 52 59 / 40%);
+  --plkit-panel-strong: #2b2930;
+  --plkit-elevated: #3b383f;
+  --plkit-modal: #211e25;
+  --plkit-log: #1d1a21;
+  --plkit-track: #36343b;
+  --plkit-text: #e6e0ea;
+  --plkit-text-muted: #cac4d4;
+  --plkit-text-info: #b7c8e1;
+  --plkit-accent: #cebdff;
+  --plkit-accent-hover: #e0d5ff;
+  --plkit-accent-ink: #381385;
+  --plkit-accent-soft: rgb(167 139 250 / 16%);
+  --plkit-success: #45dfa4;
+  --plkit-danger: #ffb4ab;
+  --plkit-warning: #febc2e;
+  --plkit-border: rgb(255 255 255 / 6%);
+  --plkit-border-strong: rgb(255 255 255 / 10%);
+  --plkit-text-70: rgb(202 196 212 / 70%);
+  --plkit-text-65: rgb(202 196 212 / 65%);
+  --plkit-text-60: rgb(202 196 212 / 60%);
+  --plkit-text-55: rgb(202 196 212 / 55%);
+  --plkit-text-50: rgb(202 196 212 / 50%);
+  --plkit-text-45: rgb(202 196 212 / 45%);
+  --plkit-text-40: rgb(202 196 212 / 40%);
+  --plkit-accent-8: rgb(167 139 250 / 8%);
+  --plkit-accent-10: rgb(167 139 250 / 10%);
+  --plkit-accent-12: rgb(167 139 250 / 12%);
+  --plkit-accent-15: rgb(167 139 250 / 15%);
+  --plkit-accent-20: rgb(167 139 250 / 20%);
+  --plkit-accent-22: rgb(167 139 250 / 22%);
+  --plkit-success-6: rgb(69 223 164 / 6%);
+  --plkit-success-12: rgb(69 223 164 / 12%);
+  --plkit-danger-12: rgb(255 180 171 / 12%);
+  --plkit-danger-14: rgb(255 180 171 / 14%);
+  --plkit-info-12: rgb(183 200 225 / 12%);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100dvh;
-  margin: 0;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; }
+body { min-width: 320px; min-height: 100dvh; overflow: hidden; }
+button, input, textarea, select { font: inherit; }
+button { color: inherit; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+*:focus-visible { outline: 2px solid var(--plkit-accent); outline-offset: 2px; }
+::selection { background: rgb(167 139 250 / 35%); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { border: 3px solid var(--plkit-canvas); border-radius: 999px; background: rgb(202 196 212 / 18%); }
+::-webkit-scrollbar-track { background: transparent; }
