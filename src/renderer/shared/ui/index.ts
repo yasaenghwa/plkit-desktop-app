@@ -9,3 +9,4 @@ export {
   StatusBadge,
 } from './dashboard-primitives';
 export type { StatusTone } from './dashboard-primitives';
+export { GatewayTitleBar } from './gateway-title-bar';
