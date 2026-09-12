@@ -125,7 +125,8 @@ export const actuatorHistorySchema = z
             deviceId: z.string(),
             command: z.string(),
             result: z.string(),
-            stateChange: z.string(),
+            stateBefore: z.string(),
+            stateAfter: z.string(),
             latencyMs: z.number().nonnegative(),
             origin: z.string(),
           })
@@ -145,7 +146,8 @@ export const cameraHistorySchema = z
           .object({
             capturedAt: z.string(),
             cameraId: z.string(),
-            file: z.string(),
+            imageId: z.string(),
+            fileUrl: z.string(),
             storage: z.literal('SAVED'),
             sync: z.enum(['PENDING', 'SYNCED']),
           })

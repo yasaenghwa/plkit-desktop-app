@@ -110,7 +110,9 @@ const ActuatorHistory = ({ data }: { readonly data: ActuatorHistoryData | null }
             <b className={item.result === 'SUCCESS' ? 'text-success' : 'text-danger'}>
               {item.result}
             </b>
-            <span>{item.stateChange}</span>
+            <span>
+              {item.stateBefore} → {item.stateAfter}
+            </span>
             <small>{item.latencyMs.toLocaleString()} ms</small>
           </div>
         ))
@@ -138,12 +140,12 @@ const CameraHistory = ({ data }: { readonly data: CameraHistoryData | null }): J
     </div>
     {data
       ? data.items.map((item) => (
-          <div className="history-table__row" key={`${item.capturedAt}-${item.file}`}>
+          <div className="history-table__row" key={`${item.capturedAt}-${item.imageId}`}>
             <time>{new Date(item.capturedAt).toLocaleString()}</time>
             <span>{item.cameraId}</span>
             <span className="camera-file">
               <i />
-              {item.file}
+              {item.imageId}
             </span>
             <b className="text-success">{item.storage}</b>
             <b className={item.sync === 'SYNCED' ? 'text-success' : 'text-info'}>{item.sync}</b>
