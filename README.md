@@ -54,7 +54,7 @@ VITE_GATEWAY_REQUEST_TIMEOUT_MS=8000
 
 Mock과 Local Gateway Core 전환은 `.env`의 REST 주소를 해당 환경 값으로 바꾼 뒤 `npm run dev`를 다시 시작하면 됩니다. 현재는 HTTP API 연결을 우선하며 WebSocket 코드는 후속 연동을 위해 유지하되 기본적으로 연결하지 않습니다. WebSocket 서버가 준비된 뒤 URL을 설정하고 `VITE_GATEWAY_WS_ENABLED=true`로 변경합니다. `VITE_` 변수는 빌드 결과에 포함될 수 있으므로 비밀번호나 토큰 같은 비밀값을 넣으면 안 됩니다.
 
-배포 환경별 값은 `shared/config/gateway-runtime.ts`에서 읽고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 한곳에 관리합니다. REST 요청은 preload의 제한된 IPC 계약을 통해 Electron main 프로세스가 전송하므로 Gateway가 CORS 헤더를 제공하지 않아도 Renderer에서 응답을 받을 수 있습니다.
+배포 환경별 값은 `shared/config/gateway-runtime.ts`에서 읽고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 한곳에 관리합니다. REST 요청은 Renderer의 `shared/api` HTTP 클라이언트가 직접 전송하므로 Gateway는 앱의 Renderer origin을 CORS 허용 목록에 포함해야 합니다. 개발 모드 요청은 DevTools Network 탭에서 확인할 수 있습니다.
 
 개발 설정은 Electron 시작 전 호스트의 `ELECTRON_RUN_AS_NODE` 값을 제거합니다. 이 값이 설정되어 있으면 Electron이 main 프로세스를 일반 Node.js로 실행해 `BrowserWindow`를 사용할 수 없게 됩니다.
 
@@ -78,11 +78,11 @@ src/
 ├── main/
 │   └── index.ts       # Electron 생명 주기와 BrowserWindow 생성
 ├── preload/
-│   └── index.ts       # Gateway REST 요청용 제한된 IPC API 노출
+│   └── index.ts       # 필요 시 제한된 Electron API를 노출하는 진입점
 └── renderer/          # Node.js API에서 분리된 React 애플리케이션
 ```
 
-`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Gateway REST 요청은 preload의 명시적인 `contextBridge` 계약을 통해 main 프로세스에 위임합니다.
+`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
 
 ## renderer FSD 구조
 

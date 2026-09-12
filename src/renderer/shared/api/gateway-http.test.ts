@@ -59,22 +59,21 @@ afterEach(() => {
 });
 
 describe('Gateway HTTP client', () => {
-  it('routes Renderer requests through the Electron bridge when CORS headers are absent', async () => {
-    const request = vi.fn().mockResolvedValue({
-      body: JSON.stringify({ gateway: 'NORMAL' }),
-      contentType: 'application/json',
-      status: 200,
-    });
-    vi.stubGlobal('window', { gatewayHttp: { request } });
+  it('uses browser fetch directly so Renderer requests remain observable', async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ gateway: 'NORMAL' }), {
+        headers: { 'content-type': 'application/json' },
+        status: 200,
+      }),
+    );
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('fetch', fetcher);
     const client = createGatewayHttpClient('http://127.0.0.1:1/api/v1', 100);
 
     const result = await client.request('system/status', z.object({ gateway: z.string() }));
 
     expect(result).toEqual({ gateway: 'NORMAL' });
-    expect(request).toHaveBeenCalledWith({
-      method: 'GET',
-      path: 'system/status',
-    });
+    expect(fetcher).toHaveBeenCalledOnce();
   });
 
   it('returns undefined without parsing JSON when the response is 204', async () => {
