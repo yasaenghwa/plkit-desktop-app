@@ -22,7 +22,7 @@ import {
   assistantSessionsSchema,
   cameraHistorySchema,
   eventHistorySchema,
-  gatewaySocketEventSchema,
+  gatewaySocketMessageSchema,
   gatewayStatusSchema,
   mqttStatusSchema,
   networkStatusSchema,
@@ -59,10 +59,11 @@ type ActuatorCommandInput =
   | { readonly command: 'RUN'; readonly durationSec: number; readonly origin: 'USER' };
 
 type CursorQuery = { readonly cursor?: string; readonly limit?: number };
-type SocketState = 'closed' | 'connecting' | 'disabled' | 'open';
+type SocketState = 'closed' | 'connecting' | 'open';
+type SocketChannel = GatewaySocketEvent['channel'];
 
 type GatewaySocketOptions = {
-  readonly channels: readonly ('actuator' | 'event' | 'system.status' | 'telemetry')[];
+  readonly channels: readonly SocketChannel[];
   readonly onError: (error: Error) => void;
   readonly onEvent: (event: GatewaySocketEvent) => void;
   readonly onStateChange: (state: SocketState) => void;
@@ -102,6 +103,70 @@ const toQuery = (query: CursorQuery): URLSearchParams =>
 
 export const createGatewayApi = (config: GatewayRuntimeConfig) => {
   const http = createGatewayHttpClient(config.apiBaseUrl, config.requestTimeoutMs ?? 8_000);
+  const socketSubscribers = new Set<GatewaySocketOptions>();
+  const subscribedChannels = new Set<SocketChannel>();
+  let socket: WebSocket | undefined;
+  let socketState: SocketState = 'closed';
+
+  const notifySocketState = (state: SocketState): void => {
+    socketState = state;
+    for (const subscriber of socketSubscribers) subscriber.onStateChange(state);
+  };
+
+  const getPendingChannels = (): SocketChannel[] => {
+    const channels: SocketChannel[] = [];
+    for (const subscriber of socketSubscribers) {
+      for (const channel of subscriber.channels) {
+        if (!subscribedChannels.has(channel) && !channels.includes(channel)) channels.push(channel);
+      }
+    }
+    return channels;
+  };
+
+  const subscribePendingChannels = (): void => {
+    if (!socket || socketState !== 'open') return;
+    const channels = getPendingChannels();
+    if (channels.length === 0) return;
+    socket.send(JSON.stringify({ type: 'subscribe', channels }));
+    for (const channel of channels) subscribedChannels.add(channel);
+  };
+
+  const openSocket = (): void => {
+    const connection = new WebSocket(config.wsUrl);
+    socket = connection;
+    notifySocketState('connecting');
+    connection.addEventListener('open', () => {
+      if (socket !== connection) return;
+      notifySocketState('open');
+      subscribePendingChannels();
+    });
+    connection.addEventListener('message', (message) => {
+      try {
+        const payload: unknown =
+          typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
+        const parsedMessage = gatewaySocketMessageSchema.parse(payload);
+        if (parsedMessage.channel === 'control') return;
+        for (const subscriber of socketSubscribers) {
+          if (subscriber.channels.includes(parsedMessage.channel))
+            subscriber.onEvent(parsedMessage);
+        }
+      } catch (error) {
+        const socketError = new GatewaySocketPayloadError(error);
+        for (const subscriber of socketSubscribers) subscriber.onError(socketError);
+      }
+    });
+    connection.addEventListener('error', () => {
+      if (socket !== connection) return;
+      const socketError = new GatewaySocketConnectionError();
+      for (const subscriber of socketSubscribers) subscriber.onError(socketError);
+    });
+    connection.addEventListener('close', () => {
+      if (socket !== connection) return;
+      socket = undefined;
+      subscribedChannels.clear();
+      notifySocketState('closed');
+    });
+  };
 
   return {
     overview: {
@@ -240,29 +305,17 @@ export const createGatewayApi = (config: GatewayRuntimeConfig) => {
     },
     socket: {
       connect: (options: GatewaySocketOptions): (() => void) => {
-        if (!config.wsEnabled) {
-          options.onStateChange('disabled');
-          return () => undefined;
+        socketSubscribers.add(options);
+        if (socket) {
+          options.onStateChange(socketState);
+          subscribePendingChannels();
+        } else {
+          openSocket();
         }
-
-        const socket = new WebSocket(config.wsUrl);
-        options.onStateChange('connecting');
-        socket.addEventListener('open', () => {
-          socket.send(JSON.stringify({ type: 'subscribe', channels: options.channels }));
-          options.onStateChange('open');
-        });
-        socket.addEventListener('message', (message) => {
-          try {
-            const payload: unknown =
-              typeof message.data === 'string' ? JSON.parse(message.data) : message.data;
-            options.onEvent(gatewaySocketEventSchema.parse(payload));
-          } catch (error) {
-            options.onError(new GatewaySocketPayloadError(error));
-          }
-        });
-        socket.addEventListener('error', () => options.onError(new GatewaySocketConnectionError()));
-        socket.addEventListener('close', () => options.onStateChange('closed'));
-        return () => socket.close();
+        return () => {
+          socketSubscribers.delete(options);
+          if (socketSubscribers.size === 0) socket?.close();
+        };
       },
     },
   } as const;

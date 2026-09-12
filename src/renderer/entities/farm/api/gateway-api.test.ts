@@ -95,7 +95,6 @@ describe('gateway API connection', () => {
     const api = createGatewayApi({
       apiBaseUrl: `http://127.0.0.1:${serverPort}/api/v1`,
       requestTimeoutMs: 1_000,
-      wsEnabled: false,
       wsUrl: `ws://127.0.0.1:${serverPort}/ws`,
     });
 
@@ -105,43 +104,98 @@ describe('gateway API connection', () => {
     expect(overview.actuators[0]?.lastRunDurationSec).toBe(10);
   });
 
-  it('does not create a WebSocket when realtime transport is disabled', () => {
-    let connectionCount = 0;
+  it('subscribes to requested channels and delivers documented system status events', () => {
     class FakeWebSocket {
+      static current: FakeWebSocket | undefined;
+      static connectionCount = 0;
+
+      readonly sentMessages: string[] = [];
+      private readonly listeners = new Map<string, Set<(event: Event) => void>>();
+
       constructor() {
-        connectionCount += 1;
+        FakeWebSocket.current = this;
+        FakeWebSocket.connectionCount += 1;
       }
 
-      addEventListener(): void {}
+      addEventListener(eventName: string, listener: (event: Event) => void): void {
+        const eventListeners = this.listeners.get(eventName) ?? new Set<(event: Event) => void>();
+        eventListeners.add(listener);
+        this.listeners.set(eventName, eventListeners);
+      }
       close(): void {}
-      send(): void {}
+      send(message: string): void {
+        this.sentMessages.push(message);
+      }
+      open(): void {
+        this.emit('open', new Event('open'));
+      }
+      receive(payload: unknown): void {
+        this.emit('message', new MessageEvent('message', { data: JSON.stringify(payload) }));
+      }
+      private emit(eventName: string, event: Event): void {
+        for (const listener of this.listeners.get(eventName) ?? []) listener(event);
+      }
     }
     vi.stubGlobal('WebSocket', FakeWebSocket);
     const api = createGatewayApi({
       apiBaseUrl: `http://127.0.0.1:${serverPort}/api/v1`,
       requestTimeoutMs: 1_000,
-      wsEnabled: false,
       wsUrl: `ws://127.0.0.1:${serverPort}/ws`,
     });
-    const onStateChange = vi.fn();
+    const onEvent = vi.fn();
+    const onTelemetryEvent = vi.fn();
 
-    const disconnect = api.socket.connect({
+    api.socket.connect({
+      channels: ['system.status'],
+      onError: vi.fn(),
+      onEvent,
+      onStateChange: vi.fn(),
+    });
+    api.socket.connect({
       channels: ['telemetry'],
       onError: vi.fn(),
-      onEvent: vi.fn(),
-      onStateChange,
+      onEvent: onTelemetryEvent,
+      onStateChange: vi.fn(),
     });
 
-    expect(connectionCount).toBe(0);
-    expect(onStateChange).toHaveBeenCalledWith('disabled');
-    disconnect();
+    const socket = FakeWebSocket.current;
+    if (!socket) throw new TypeError('Expected a WebSocket connection.');
+
+    expect(FakeWebSocket.connectionCount).toBe(1);
+    socket.open();
+    socket.receive({
+      channel: 'system.status',
+      gateway: 'NORMAL',
+      localDb: 'NORMAL',
+      wifiAp: 'ACTIVE',
+      bleBeacon: 'ACTIVE',
+      mqttBroker: 'RUNNING',
+      cloudSync: 'ONLINE',
+      lastSyncAt: '2026-08-29T15:31:02+09:00',
+      alertCount: 1,
+    });
+
+    expect(socket.sentMessages).toEqual([
+      JSON.stringify({ type: 'subscribe', channels: ['system.status', 'telemetry'] }),
+    ]);
+    expect(onEvent).toHaveBeenCalledWith({
+      channel: 'system.status',
+      gateway: 'NORMAL',
+      localDb: 'NORMAL',
+      wifiAp: 'ACTIVE',
+      bleBeacon: 'ACTIVE',
+      mqttBroker: 'RUNNING',
+      cloudSync: 'ONLINE',
+      lastSyncAt: '2026-08-29T15:31:02+09:00',
+      alertCount: 1,
+    });
+    expect(onTelemetryEvent).not.toHaveBeenCalled();
   });
 
   it('returns parsed system status when the Gateway responds', async () => {
     const api = createGatewayApi({
       apiBaseUrl: `http://127.0.0.1:${serverPort}/api/v1`,
       requestTimeoutMs: 1_000,
-      wsEnabled: false,
       wsUrl: `ws://127.0.0.1:${serverPort}/ws`,
     });
 
@@ -155,7 +209,6 @@ describe('gateway API connection', () => {
     const api = createGatewayApi({
       apiBaseUrl: `http://127.0.0.1:${serverPort}/invalid/api/v1`,
       requestTimeoutMs: 1_000,
-      wsEnabled: false,
       wsUrl: `ws://127.0.0.1:${serverPort}/ws`,
     });
 
