@@ -1,4 +1,15 @@
-import { CHART_POINTS } from '@entities/farm';
+import { useEffect, useState } from 'react';
+
+import {
+  CHART_POINTS,
+  gatewayApi,
+  getGatewayErrorMessage,
+  toChartPoints,
+  type ActuatorHistory as ActuatorHistoryData,
+  type CameraHistory as CameraHistoryData,
+  type EventHistory as EventHistoryData,
+  type SensorHistory as SensorHistoryData,
+} from '@entities/farm';
 import { LineChart, PageTitle, Panel, SegmentedControl } from '@shared/ui';
 
 const HISTORY_TABS = ['Sensor', 'Actuator', 'Camera', 'Event'] as const;
@@ -30,53 +41,222 @@ const EVENT_ROWS = [
 
 type HistorySectionProps = {
   readonly onTabChange: (tab: HistoryTab) => void;
+  readonly notify: (message: string) => void;
   readonly tab: HistoryTab;
 };
 
-const SensorHistory = (): JSX.Element => (
+const SensorHistory = ({ data }: { readonly data: SensorHistoryData | null }): JSX.Element => (
   <Panel className="history-chart-panel">
     <header className="history-chart-header">
-      <strong>Soil Moisture · core-001 · Last 24h</strong>
-      <div><span>Min <b>35.8 %</b></span><span>Max <b>48.2 %</b></span><span>Avg <b>42.1 %</b></span><button type="button">CSV Export</button></div>
+      <strong>Soil Moisture · {data?.deviceId ?? 'core-001'} · Last 24h</strong>
+      <div>
+        <span>
+          Min{' '}
+          <b>
+            {data?.stats.min ?? 35.8} {data?.unit ?? '%'}
+          </b>
+        </span>
+        <span>
+          Max{' '}
+          <b>
+            {data?.stats.max ?? 48.2} {data?.unit ?? '%'}
+          </b>
+        </span>
+        <span>
+          Avg{' '}
+          <b>
+            {data?.stats.avg ?? 42.1} {data?.unit ?? '%'}
+          </b>
+        </span>
+        <a href={gatewayApi.history.sensorExportUrl(data?.deviceId ?? 'core-001')}>CSV Export</a>
+      </div>
     </header>
-    <LineChart label="Soil moisture last 24 hours" points={CHART_POINTS} variant="history" />
-    <div className="chart-axis chart-axis--history"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>now</span></div>
-    <p className="screen-note">밴드 = 적정 범위 (35~55%) · ┆ = Pump command · 급수 후 상승 여부를 시간축으로 확인</p>
+    <LineChart
+      label="Soil moisture last 24 hours"
+      points={data ? toChartPoints(data.points.map((point) => point.v)) : CHART_POINTS}
+      variant="history"
+    />
+    <div className="chart-axis chart-axis--history">
+      <span>00:00</span>
+      <span>04:00</span>
+      <span>08:00</span>
+      <span>12:00</span>
+      <span>16:00</span>
+      <span>20:00</span>
+      <span>now</span>
+    </div>
+    <p className="screen-note">
+      밴드 = 적정 범위 (35~55%) · ┆ = Pump command · 급수 후 상승 여부를 시간축으로 확인
+    </p>
   </Panel>
 );
 
-const ActuatorHistory = (): JSX.Element => (
+const ActuatorHistory = ({ data }: { readonly data: ActuatorHistoryData | null }): JSX.Element => (
   <div className="table-panel history-table history-table--actuator">
-    <div className="history-table__header"><span>Time</span><span>Device</span><span>Command</span><span>Result</span><span>State</span><span>Latency</span></div>
-    {ACTUATOR_ROWS.map(([time, device, command, result, state, latency]) => (
-      <div className="history-table__row" key={`${time}-${device}`}><time>{time}</time><strong>{device}</strong><span>{command}</span><b className={result === 'SUCCESS' ? 'text-success' : 'text-danger'}>{result}</b><span>{state}</span><small>{latency}</small></div>
-    ))}
+    <div className="history-table__header">
+      <span>Time</span>
+      <span>Device</span>
+      <span>Command</span>
+      <span>Result</span>
+      <span>State</span>
+      <span>Latency</span>
+    </div>
+    {data
+      ? data.items.map((item) => (
+          <div className="history-table__row" key={`${item.at}-${item.deviceId}`}>
+            <time>{new Date(item.at).toLocaleString()}</time>
+            <strong>{item.deviceId}</strong>
+            <span>{item.command}</span>
+            <b className={item.result === 'SUCCESS' ? 'text-success' : 'text-danger'}>
+              {item.result}
+            </b>
+            <span>
+              {item.stateBefore} → {item.stateAfter}
+            </span>
+            <small>{item.latencyMs.toLocaleString()} ms</small>
+          </div>
+        ))
+      : ACTUATOR_ROWS.map(([time, device, command, result, state, latency]) => (
+          <div className="history-table__row" key={`${time}-${device}`}>
+            <time>{time}</time>
+            <strong>{device}</strong>
+            <span>{command}</span>
+            <b className={result === 'SUCCESS' ? 'text-success' : 'text-danger'}>{result}</b>
+            <span>{state}</span>
+            <small>{latency}</small>
+          </div>
+        ))}
   </div>
 );
 
-const CameraHistory = (): JSX.Element => (
+const CameraHistory = ({ data }: { readonly data: CameraHistoryData | null }): JSX.Element => (
   <div className="table-panel history-table history-table--camera">
-    <div className="history-table__header"><span>Captured At</span><span>Camera</span><span>Image</span><span>Storage</span><span>Sync</span></div>
-    {CAMERA_ROWS.map(([time, file, sync]) => (
-      <div className="history-table__row" key={file}><time>{time}</time><span>growth-cam-001</span><span className="camera-file"><i />{file}</span><b className="text-success">SAVED</b><b className="text-success">{sync}</b></div>
-    ))}
+    <div className="history-table__header">
+      <span>Captured At</span>
+      <span>Camera</span>
+      <span>Image</span>
+      <span>Storage</span>
+      <span>Sync</span>
+    </div>
+    {data
+      ? data.items.map((item) => (
+          <div className="history-table__row" key={`${item.capturedAt}-${item.imageId}`}>
+            <time>{new Date(item.capturedAt).toLocaleString()}</time>
+            <span>{item.cameraId}</span>
+            <span className="camera-file">
+              <i />
+              {item.imageId}
+            </span>
+            <b className="text-success">{item.storage}</b>
+            <b className={item.sync === 'SYNCED' ? 'text-success' : 'text-info'}>{item.sync}</b>
+          </div>
+        ))
+      : CAMERA_ROWS.map(([time, file, sync]) => (
+          <div className="history-table__row" key={file}>
+            <time>{time}</time>
+            <span>growth-cam-001</span>
+            <span className="camera-file">
+              <i />
+              {file}
+            </span>
+            <b className="text-success">SAVED</b>
+            <b className="text-success">{sync}</b>
+          </div>
+        ))}
   </div>
 );
 
-const EventHistory = (): JSX.Element => (
+const EventHistory = ({ data }: { readonly data: EventHistoryData | null }): JSX.Element => (
   <div className="table-panel event-history">
-    {EVENT_ROWS.map(([time, type, message]) => (
-      <div key={`${time}-${type}`}><time>{time}</time><span className={type === 'TIMEOUT' || type === 'OFFLINE' ? 'event-tag event-tag--danger' : type === 'MODULE' || type === 'NEW DEVICE' ? 'event-tag event-tag--accent' : 'event-tag'}>{type}</span><p>{message}</p></div>
-    ))}
+    {data
+      ? data.items.map((item) => (
+          <div key={`${item.at}-${item.type}`}>
+            <time>{new Date(item.at).toLocaleString()}</time>
+            <span
+              className={
+                item.type === 'TIMEOUT' || item.type === 'OFFLINE'
+                  ? 'event-tag event-tag--danger'
+                  : item.type === 'MODULE' || item.type === 'NEW_DEVICE'
+                    ? 'event-tag event-tag--accent'
+                    : 'event-tag'
+              }
+            >
+              {item.type}
+            </span>
+            <p>{item.message}</p>
+          </div>
+        ))
+      : EVENT_ROWS.map(([time, type, message]) => (
+          <div key={`${time}-${type}`}>
+            <time>{time}</time>
+            <span
+              className={
+                type === 'TIMEOUT' || type === 'OFFLINE'
+                  ? 'event-tag event-tag--danger'
+                  : type === 'MODULE' || type === 'NEW DEVICE'
+                    ? 'event-tag event-tag--accent'
+                    : 'event-tag'
+              }
+            >
+              {type}
+            </span>
+            <p>{message}</p>
+          </div>
+        ))}
   </div>
 );
 
-export const HistorySection = ({ onTabChange, tab }: HistorySectionProps): JSX.Element => (
-  <div className="screen-stack">
-    <PageTitle action={<SegmentedControl active={tab} label="History type" onChange={onTabChange} options={HISTORY_TABS} />}>History</PageTitle>
-    {tab === 'Sensor' ? <SensorHistory /> : null}
-    {tab === 'Actuator' ? <ActuatorHistory /> : null}
-    {tab === 'Camera' ? <CameraHistory /> : null}
-    {tab === 'Event' ? <EventHistory /> : null}
-  </div>
-);
+export const HistorySection = ({ notify, onTabChange, tab }: HistorySectionProps): JSX.Element => {
+  const [sensor, setSensor] = useState<SensorHistoryData | null>(null);
+  const [actuator, setActuator] = useState<ActuatorHistoryData | null>(null);
+  const [camera, setCamera] = useState<CameraHistoryData | null>(null);
+  const [events, setEvents] = useState<EventHistoryData | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async (): Promise<void> => {
+      try {
+        switch (tab) {
+          case 'Sensor':
+            setSensor(await gatewayApi.history.sensor('core-001', controller.signal));
+            break;
+          case 'Actuator':
+            setActuator(await gatewayApi.history.actuator({ limit: 50 }, controller.signal));
+            break;
+          case 'Camera':
+            setCamera(await gatewayApi.history.camera({ limit: 50 }, controller.signal));
+            break;
+          case 'Event':
+            setEvents(await gatewayApi.history.events({ limit: 100 }, controller.signal));
+            break;
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        notify(`History 조회 실패 · ${getGatewayErrorMessage(error)}`);
+      }
+    };
+    void load();
+    return () => controller.abort();
+  }, [notify, tab]);
+
+  return (
+    <div className="screen-stack">
+      <PageTitle
+        action={
+          <SegmentedControl
+            active={tab}
+            label="History type"
+            onChange={onTabChange}
+            options={HISTORY_TABS}
+          />
+        }
+      >
+        History
+      </PageTitle>
+      {tab === 'Sensor' ? <SensorHistory data={sensor} /> : null}
+      {tab === 'Actuator' ? <ActuatorHistory data={actuator} /> : null}
+      {tab === 'Camera' ? <CameraHistory data={camera} /> : null}
+      {tab === 'Event' ? <EventHistory data={events} /> : null}
+    </div>
+  );
+};

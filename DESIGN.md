@@ -29,6 +29,8 @@
 | Status success | `--plkit-success` | `#45dfa4` | 41, 681행 | 정상·온라인·성공 |
 | Status danger | `--plkit-danger` | `#ffb4ab` | 37, 681행 | 경고·오프라인·실패 |
 | Status warning | `--plkit-warning` | `#febc2e` | 32, 837행 | WARN 로그 |
+| Window close | `--plkit-window-close` | `#ff736a` | 31행 | 타이틀바 닫기 표시등 |
+| Window maximize | `--plkit-window-maximize` | `#19c332` | 33행 | 타이틀바 최대화 표시등 |
 
 색상 알파 변형은 위 역할의 `rgb()` 채널을 사용한 원본 값만 허용합니다. 컴포넌트에 라임 `#a8ff3e`, `#82d51f`, 임의 보라 `#9a7cff`, 임의 파랑 `#62b7ff`를 사용하지 않습니다.
 
@@ -61,8 +63,13 @@
 ## 5. 컴포넌트
 
 ### GatewayShell
-- **구조**: stage → 전체 화면 shell → 224px sidebar + content/footer.
+- **구조**: stage → 전체 화면 shell → 44px `GatewayTitleBar` + 224px sidebar + content/footer.
 - **레이아웃/스크롤**: 콘텐츠 본문만 scroll owner입니다.
+
+### GatewayTitleBar
+- **구조**: 44px chrome surface → 창 표시등 + 앱 이름 → 알림 버튼 + Gateway 상태 + 로컬 시각.
+- **상태**: 알림 수와 Gateway 상태는 API 연결 전까지 각각 `1`, `Gateway Online` 정적 값이며 시각만 로컬 시스템 시간을 사용합니다.
+- **동작**: 알림 버튼은 History의 Event 탭으로 이동하고, hover는 라벤더 15% 표면, focus는 공통 2px 라벤더 outline을 사용합니다.
 
 ### NavigationItem
 - **구조**: 17px 선형 SVG + 레이블.

@@ -28,7 +28,12 @@ type PageTitleProps = {
   readonly subtitle?: string;
 };
 
-export const PageTitle = ({ action, children, iconPath, subtitle }: PageTitleProps): JSX.Element => (
+export const PageTitle = ({
+  action,
+  children,
+  iconPath,
+  subtitle,
+}: PageTitleProps): JSX.Element => (
   <header className="page-title">
     <div className="page-title__heading">
       {iconPath ? <Icon path={iconPath} size={28} /> : null}
@@ -47,7 +52,11 @@ type StatusBadgeProps = {
   readonly tone?: StatusTone;
 };
 
-export const StatusBadge = ({ label, pulse = false, tone = 'muted' }: StatusBadgeProps): JSX.Element => (
+export const StatusBadge = ({
+  label,
+  pulse = false,
+  tone = 'muted',
+}: StatusBadgeProps): JSX.Element => (
   <span className={`status-badge status-badge--${tone}`}>
     <span aria-hidden="true" className={`status-badge__dot${pulse ? ' pulse' : ''}`} />
     {label}
@@ -100,12 +109,17 @@ export const DataRows = ({ rows }: DataRowsProps): JSX.Element => (
 type ImageSlotProps = {
   readonly className?: string;
   readonly label: string;
+  readonly source?: string | undefined;
 };
 
-export const ImageSlot = ({ className = '', label }: ImageSlotProps): JSX.Element => (
+export const ImageSlot = ({ className = '', label, source }: ImageSlotProps): JSX.Element => (
   <div className={`image-slot ${className}`.trim()}>
-    <Icon path="M4 5h16v14H4z M7 16l4-5 3 3 2-2 2 4 M16 9h.01" size={24} />
-    <span>{label}</span>
+    {source ? (
+      <img alt={label} src={source} />
+    ) : (
+      <Icon path="M4 5h16v14H4z M7 16l4-5 3 3 2-2 2 4 M16 9h.01" size={24} />
+    )}
+    {source ? null : <span>{label}</span>}
   </div>
 );
 
@@ -134,7 +148,9 @@ export const LineChart = ({ label, points, variant = 'sensor' }: LineChartProps)
     role="img"
     viewBox="0 0 720 200"
   >
-    {variant === 'history' ? <rect className="line-chart__range" height="75" width="720" x="0" y="55" /> : null}
+    {variant === 'history' ? (
+      <rect className="line-chart__range" height="75" width="720" x="0" y="55" />
+    ) : null}
     <line className="line-chart__grid" x1="0" x2="720" y1="50" y2="50" />
     <line className="line-chart__grid" x1="0" x2="720" y1="100" y2="100" />
     <line className="line-chart__grid" x1="0" x2="720" y1="150" y2="150" />

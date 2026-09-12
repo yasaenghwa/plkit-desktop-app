@@ -1,6 +1,6 @@
 # PLKIT 데스크톱 대시보드
 
-PLKIT는 스마트팜 데이터를 모니터링하고 장치를 제어하기 위한 데스크톱 대시보드 프로젝트입니다. Electron과 React 기반의 정적 대시보드 프로토타입을 Feature-Sliced Design(FSD)에 맞춰 구성했습니다. 현재 화면은 목업 데이터를 사용하며 센서, 게이트웨이, MQTT, 데이터베이스 또는 외부 서비스와는 아직 연결하지 않습니다.
+PLKIT는 스마트팜 데이터를 모니터링하고 장치를 제어하기 위한 데스크톱 대시보드 프로젝트입니다. Electron과 React 기반 대시보드를 Feature-Sliced Design(FSD)에 맞춰 구성했으며, Gateway Core의 REST 및 WebSocket API에 연결합니다.
 
 ## 현재 구현 범위
 
@@ -17,7 +17,7 @@ PLKIT는 스마트팜 데이터를 모니터링하고 장치를 제어하기 위
 | System        | Gateway·Network·MQTT·Central Sync·Logs 상태와 로그 필터                 |
 | AI Assistant  | 현재 농장 컨텍스트, 알림, 입력 메시지에 대한 모의 답변                  |
 
-화면 전환, 필터, 탭, 장치 상세 보기, 모달, 토스트, 폼 입력과 같은 프런트엔드 상호작용은 동작합니다. 다만 표시 데이터와 작업 결과는 모두 프런트엔드에 정의된 정적 데이터 또는 로컬 React 상태이며 실제 장치 명령이나 데이터 저장은 수행하지 않습니다.
+화면 전환, 필터, 탭, 장치 상세 보기, 모달, 토스트, 폼 입력과 같은 프런트엔드 상호작용이 동작합니다. Gateway가 응답하면 조회 데이터는 REST 응답으로 갱신되고, 센서·Actuator·장치 발견·카메라 이벤트는 WebSocket으로 반영됩니다. Gateway에 연결할 수 없는 동안에는 기존 화면 구조를 유지하면서 연결 오류를 토스트로 알립니다.
 
 ## 실행 환경
 
@@ -30,10 +30,31 @@ PLKIT는 스마트팜 데이터를 모니터링하고 장치를 제어하기 위
 
 ```bash
 npm install
+npm run test
 npm run dev
 ```
 
 `npm run dev`는 Vite 렌더러 개발 서버를 시작하고 로컬 Electron 창을 엽니다. 창에는 **PLKIT Desktop Dashboard** 초기 화면이 표시됩니다.
+
+## Gateway 연결 설정
+
+프로젝트 루트의 Git에서 제외된 `.env`에 실행 환경의 Gateway 주소를 입력합니다. 실제 주소는 저장소의 README나 소스 코드에 기록하지 않습니다.
+
+```dotenv
+VITE_GATEWAY_API_BASE_URL=<REST API base URL including /api/v1>
+VITE_GATEWAY_WS_ENABLED=false
+VITE_GATEWAY_WS_URL=<WebSocket URL>
+VITE_GATEWAY_REQUEST_TIMEOUT_MS=8000
+```
+
+- `VITE_GATEWAY_API_BASE_URL`: REST API의 `/api/v1`까지 포함한 base URL
+- `VITE_GATEWAY_WS_ENABLED`: WebSocket 연결 활성화 여부. 서버 구현 전에는 `false`
+- `VITE_GATEWAY_WS_URL`: Gateway Core WebSocket URL
+- `VITE_GATEWAY_REQUEST_TIMEOUT_MS`: REST 요청 제한 시간(ms)
+
+Mock과 Local Gateway Core 전환은 `.env`의 REST 주소를 해당 환경 값으로 바꾼 뒤 `npm run dev`를 다시 시작하면 됩니다. 현재는 HTTP API 연결을 우선하며 WebSocket 코드는 후속 연동을 위해 유지하되 기본적으로 연결하지 않습니다. WebSocket 서버가 준비된 뒤 URL을 설정하고 `VITE_GATEWAY_WS_ENABLED=true`로 변경합니다. `VITE_` 변수는 빌드 결과에 포함될 수 있으므로 비밀번호나 토큰 같은 비밀값을 넣으면 안 됩니다.
+
+배포 환경별 값은 `shared/config/gateway-runtime.ts`에서 읽고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 한곳에 관리합니다. REST 요청은 Renderer의 `shared/api` HTTP 클라이언트가 직접 전송하므로 Gateway는 앱의 Renderer origin을 CORS 허용 목록에 포함해야 합니다. 개발 모드 요청은 DevTools Network 탭에서 확인할 수 있습니다.
 
 개발 설정은 Electron 시작 전 호스트의 `ELECTRON_RUN_AS_NODE` 값을 제거합니다. 이 값이 설정되어 있으면 Electron이 main 프로세스를 일반 Node.js로 실행해 `BrowserWindow`를 사용할 수 없게 됩니다.
 
@@ -44,6 +65,7 @@ npm run dev
 | `npm run dev`          | 개발 모드로 Electron 애플리케이션 실행           |
 | `npm run build`        | main, preload, renderer를 `out/`에 프로덕션 빌드 |
 | `npm run preview`      | 프로덕션 빌드를 로컬 Electron으로 실행           |
+| `npm run test`         | 로컬 HTTP 서버로 Gateway 연결·응답 계약 검사     |
 | `npm run typecheck`    | 파일을 생성하지 않고 엄격한 TypeScript 검사 수행 |
 | `npm run lint`         | ESLint 및 FSD 별칭 import 규칙 검사              |
 | `npm run format`       | Prettier로 프로젝트 파일 포맷                    |
@@ -56,11 +78,11 @@ src/
 ├── main/
 │   └── index.ts       # Electron 생명 주기와 BrowserWindow 생성
 ├── preload/
-│   └── index.ts       # 현재 API를 노출하지 않음, 향후 IPC는 contextBridge 사용
+│   └── index.ts       # 필요 시 제한된 Electron API를 노출하는 진입점
 └── renderer/          # Node.js API에서 분리된 React 애플리케이션
 ```
 
-`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. renderer는 Node.js API를 직접 import하면 안 됩니다. 향후 IPC는 preload의 명시적인 `contextBridge` 계약을 통해서만 추가합니다.
+`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
 
 ## renderer FSD 구조
 
@@ -114,8 +136,8 @@ src/renderer/
 │   │   └── index.ts
 │   └── index.ts
 └── shared/
-    ├── api/index.ts                      # 향후 외부 통신 공통 계약
-    ├── config/index.ts                   # 공통 설정 공개 API
+    ├── api/                              # ky 기반 HTTP 전송 및 RFC 9457 오류 변환
+    ├── config/                           # 환경별 Gateway origin과 endpoint 경로
     ├── lib/index.ts                      # 범용 기반 로직 공개 API
     ├── types/index.ts                    # 공통 타입 공개 API
     └── ui/
@@ -140,4 +162,4 @@ FSD는 `src/renderer`에만 적용합니다. `main`과 `preload`는 Electron 프
 
 ## 의도적으로 제외한 범위
 
-현재 정적 프로토타입에는 실제 센서 데이터 수집, MQTT/WebSocket/HTTP 연결, 장치 제어 명령 전송, 영상 스트리밍, 데이터 영속화, Node-RED 연동, AI 모델 연동, 중앙 플랫폼 동기화, 배포 설치 파일, 코드 서명, 자동 업데이트, CI/CD를 포함하지 않습니다.
+Gateway 내부 센서 수집, MQTT 처리, 데이터 영속화, 영상 스트리밍, Node-RED 연동, AI 모델 실행, 중앙 플랫폼 자체 구현, 배포 설치 파일, 코드 서명, 자동 업데이트, CI/CD는 이 프런트엔드 저장소의 범위에 포함하지 않습니다.

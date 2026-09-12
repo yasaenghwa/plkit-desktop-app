@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Icon } from '@shared/ui';
+import { gatewayApi, getGatewayErrorMessage, type SystemStatus } from '@entities/farm';
+import { GatewayTitleBar, Icon } from '@shared/ui';
 import { AssistantSection } from '@widgets/assistant';
 import { CameraSection } from '@widgets/camera';
 import { ControlSection } from '@widgets/control';
@@ -37,6 +38,7 @@ const DashboardContent = ({
     case 'overview':
       return (
         <OverviewSection
+          notify={notify}
           onOpenCamera={() => onNavigate('camera')}
           onOpenControl={() => onNavigate('control')}
           onOpenHistory={() => onNavigate('history')}
@@ -49,6 +51,7 @@ const DashboardContent = ({
     case 'monitoring':
       return (
         <MonitoringSection
+          notify={notify}
           onHistory={() => {
             onHistoryTabChange('Sensor');
             onNavigate('history');
@@ -62,11 +65,11 @@ const DashboardContent = ({
     case 'camera':
       return <CameraSection notify={notify} />;
     case 'history':
-      return <HistorySection onTabChange={onHistoryTabChange} tab={historyTab} />;
+      return <HistorySection notify={notify} onTabChange={onHistoryTabChange} tab={historyTab} />;
     case 'system':
       return <SystemSection notify={notify} />;
     case 'assistant':
-      return <AssistantSection />;
+      return <AssistantSection notify={notify} />;
   }
 };
 
@@ -75,7 +78,33 @@ export const DashboardPage = (): JSX.Element => {
   const [historyTab, setHistoryTab] = useState<HistoryTab>('Sensor');
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const connectionErrorShownRef = useRef(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadStatus = async (): Promise<void> => {
+      try {
+        const status = await gatewayApi.system.getStatus(controller.signal);
+        setSystemStatus(status);
+        connectionErrorShownRef.current = false;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        if (!connectionErrorShownRef.current) {
+          setToast(`Gateway 연결 실패 · ${getGatewayErrorMessage(error)}`);
+          connectionErrorShownRef.current = true;
+        }
+      }
+    };
+
+    void loadStatus();
+    const interval = window.setInterval(() => void loadStatus(), 5_000);
+    return () => {
+      controller.abort();
+      window.clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -89,20 +118,39 @@ export const DashboardPage = (): JSX.Element => {
     mainRef.current?.scrollTo({ top: 0 });
   };
 
+  const openEvents = (): void => {
+    setHistoryTab('Event');
+    navigate('history');
+  };
+
   return (
     <div className="dashboard-stage">
       <div className="dashboard-shell">
+        <GatewayTitleBar onOpenEvents={openEvents} />
         <div className="dashboard-body">
           <aside className="sidebar">
-            <button className="brand" onClick={() => navigate('overview')} type="button"><strong>PLKIT</strong><small>GATEWAY · RASPBERRY PI</small></button>
+            <button className="brand" onClick={() => navigate('overview')} type="button">
+              <strong>PLKIT</strong>
+              <small>GATEWAY · RASPBERRY PI</small>
+            </button>
             <nav aria-label="Dashboard navigation">
               {NAVIGATION_ITEMS.map((item) => (
-                <button aria-current={route === item.id ? 'page' : undefined} key={item.id} onClick={() => navigate(item.id)} type="button">
-                  <Icon path={item.iconPath} /><span>{item.label}</span>
+                <button
+                  aria-current={route === item.id ? 'page' : undefined}
+                  key={item.id}
+                  onClick={() => navigate(item.id)}
+                  type="button"
+                >
+                  <Icon path={item.iconPath} />
+                  <span>{item.label}</span>
                 </button>
               ))}
             </nav>
-            <p className="sidebar__footer">Gateway v0.2.0<br />Local First · Offline OK</p>
+            <p className="sidebar__footer">
+              Gateway v0.2.0
+              <br />
+              Local First · Offline OK
+            </p>
           </aside>
           <div className="content-column">
             <main aria-label={`${route} dashboard`} className="dashboard-content" ref={mainRef}>
@@ -117,13 +165,34 @@ export const DashboardPage = (): JSX.Element => {
               />
             </main>
             <footer className="statusbar">
-              {['Local DB', 'Wi-Fi AP', 'BLE Beacon', 'MQTT Broker'].map((label) => <span key={label}><i />{label}</span>)}
-              <span><i />Cloud Sync · ONLINE</span><time>Last Sync 15:31:02</time>
+              {[
+                ['Local DB', systemStatus?.localDb ?? 'CHECKING'],
+                ['Wi-Fi AP', systemStatus?.wifiAp ?? 'CHECKING'],
+                ['BLE Beacon', systemStatus?.bleBeacon ?? 'CHECKING'],
+                ['MQTT Broker', systemStatus?.mqttBroker ?? 'CHECKING'],
+              ].map(([label, state]) => (
+                <span key={label}>
+                  <i />
+                  {label} · {state}
+                </span>
+              ))}
+              <span>
+                <i />
+                Cloud Sync · {systemStatus?.cloudSync ?? 'CHECKING'}
+              </span>
+              <time>
+                Last Sync{' '}
+                {systemStatus ? new Date(systemStatus.lastSyncAt).toLocaleTimeString() : '—'}
+              </time>
             </footer>
           </div>
         </div>
       </div>
-      {toast ? <div className="toast" role="status">{toast}</div> : null}
+      {toast ? (
+        <div className="toast" role="status">
+          {toast}
+        </div>
+      ) : null}
     </div>
   );
 };
