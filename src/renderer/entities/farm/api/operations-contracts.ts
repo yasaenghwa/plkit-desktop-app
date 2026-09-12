@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
-export const systemStatusSchema = z
-  .object({
-    gateway: z.string(),
-    localDb: z.string(),
-    wifiAp: z.string(),
-    bleBeacon: z.string(),
-    mqttBroker: z.string(),
-    cloudSync: z.enum(['ONLINE', 'OFFLINE', 'SYNCING']),
-    lastSyncAt: z.string(),
-    alertCount: z.number().int().nonnegative(),
-  })
-  .readonly();
+const systemStatusPayloadSchema = z.object({
+  gateway: z.string(),
+  localDb: z.string(),
+  wifiAp: z.string(),
+  bleBeacon: z.string(),
+  mqttBroker: z.string(),
+  cloudSync: z.enum(['ONLINE', 'OFFLINE', 'SYNCING']),
+  lastSyncAt: z.string(),
+  alertCount: z.number().int().nonnegative(),
+});
+
+export const systemStatusSchema = systemStatusPayloadSchema.readonly();
 
 export const gatewayStatusSchema = z
   .object({
@@ -204,6 +204,7 @@ export const assistantSessionsSchema = z
   .readonly();
 
 export const gatewaySocketEventSchema = z.union([
+  systemStatusPayloadSchema.extend({ channel: z.literal('system.status') }).readonly(),
   z
     .object({
       channel: z.literal('telemetry'),
@@ -250,6 +251,20 @@ export const gatewaySocketEventSchema = z.union([
     .readonly(),
 ]);
 
+export const gatewaySocketSubscriptionAcknowledgementSchema = z
+  .object({
+    channel: z.literal('control'),
+    type: z.literal('SUBSCRIBED'),
+    channels: z.array(z.string()).readonly(),
+    at: z.string(),
+  })
+  .readonly();
+
+export const gatewaySocketMessageSchema = z.union([
+  gatewaySocketEventSchema,
+  gatewaySocketSubscriptionAcknowledgementSchema,
+]);
+
 export type SystemStatus = z.infer<typeof systemStatusSchema>;
 export type GatewayStatus = z.infer<typeof gatewayStatusSchema>;
 export type NetworkStatus = z.infer<typeof networkStatusSchema>;
@@ -262,3 +277,4 @@ export type CameraHistory = z.infer<typeof cameraHistorySchema>;
 export type EventHistory = z.infer<typeof eventHistorySchema>;
 export type AssistantContext = z.infer<typeof assistantContextSchema>;
 export type GatewaySocketEvent = z.infer<typeof gatewaySocketEventSchema>;
+export type GatewaySocketMessage = z.infer<typeof gatewaySocketMessageSchema>;

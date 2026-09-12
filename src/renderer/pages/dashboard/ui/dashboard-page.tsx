@@ -99,10 +99,40 @@ export const DashboardPage = (): JSX.Element => {
     };
 
     void loadStatus();
-    const interval = window.setInterval(() => void loadStatus(), 5_000);
+    const disconnect = gatewayApi.socket.connect({
+      channels: ['system.status'],
+      onError: (error) => {
+        if (!connectionErrorShownRef.current) {
+          setToast(`Gateway WebSocket 연결 실패 · ${error.message}`);
+          connectionErrorShownRef.current = true;
+        }
+      },
+      onEvent: (event) => {
+        switch (event.channel) {
+          case 'system.status':
+            setSystemStatus({
+              gateway: event.gateway,
+              localDb: event.localDb,
+              wifiAp: event.wifiAp,
+              bleBeacon: event.bleBeacon,
+              mqttBroker: event.mqttBroker,
+              cloudSync: event.cloudSync,
+              lastSyncAt: event.lastSyncAt,
+              alertCount: event.alertCount,
+            });
+            connectionErrorShownRef.current = false;
+            break;
+          case 'actuator':
+          case 'event':
+          case 'telemetry':
+            break;
+        }
+      },
+      onStateChange: () => undefined,
+    });
     return () => {
       controller.abort();
-      window.clearInterval(interval);
+      disconnect();
     };
   }, []);
 
