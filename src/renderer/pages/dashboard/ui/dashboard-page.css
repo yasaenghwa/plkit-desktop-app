@@ -25,12 +25,119 @@
   background: var(--plkit-canvas);
 }
 
-.sidebar svg, .page-title svg, .image-slot svg, .monitoring-card svg, .environment-metric svg, .chat-panel svg {
+.sidebar svg,
+.gateway-titlebar svg,
+.page-title svg,
+.image-slot svg,
+.monitoring-card svg,
+.environment-metric svg,
+.chat-panel svg {
   fill: none;
   stroke: currentcolor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
+}
+
+.gateway-titlebar {
+  display: flex;
+  height: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--plkit-border);
+  background: var(--plkit-chrome);
+}
+.gateway-titlebar__window-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gateway-titlebar__window-control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.gateway-titlebar__window-control--close {
+  background: var(--plkit-window-close);
+}
+.gateway-titlebar__window-control--minimize {
+  background: var(--plkit-warning);
+}
+.gateway-titlebar__window-control--maximize {
+  background: var(--plkit-window-maximize);
+}
+.gateway-titlebar__app-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--plkit-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gateway-titlebar__status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.gateway-titlebar__notifications {
+  position: relative;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--plkit-text-muted);
+  cursor: pointer;
+}
+.gateway-titlebar__notifications:hover {
+  background: var(--plkit-accent-15);
+}
+.gateway-titlebar__notifications > span {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  display: grid;
+  min-width: 14px;
+  height: 14px;
+  place-items: center;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--plkit-danger);
+  color: var(--plkit-canvas);
+  font-size: 9px;
+  font-weight: 700;
+}
+.gateway-titlebar__connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  background: var(--plkit-success-12);
+  color: var(--plkit-success);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gateway-titlebar__connection > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--plkit-success);
+}
+.gateway-titlebar time {
+  min-width: 32px;
+  color: var(--plkit-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .dashboard-body { display: flex; min-height: 0; flex: 1; }

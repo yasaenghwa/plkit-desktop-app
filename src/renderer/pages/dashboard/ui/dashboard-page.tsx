@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { gatewayApi, getGatewayErrorMessage, type SystemStatus } from '@entities/farm';
-import { Icon } from '@shared/ui';
+import { GatewayTitleBar, Icon } from '@shared/ui';
 import { AssistantSection } from '@widgets/assistant';
 import { CameraSection } from '@widgets/camera';
 import { ControlSection } from '@widgets/control';
@@ -118,9 +118,15 @@ export const DashboardPage = (): JSX.Element => {
     mainRef.current?.scrollTo({ top: 0 });
   };
 
+  const openEvents = (): void => {
+    setHistoryTab('Event');
+    navigate('history');
+  };
+
   return (
     <div className="dashboard-stage">
       <div className="dashboard-shell">
+        <GatewayTitleBar onOpenEvents={openEvents} />
         <div className="dashboard-body">
           <aside className="sidebar">
             <button className="brand" onClick={() => navigate('overview')} type="button">
