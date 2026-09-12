@@ -1,5 +1,14 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'node:path';
+
+import { createGatewayRequestHandler } from './gateway-api-proxy';
+
+const GATEWAY_HTTP_CHANNEL = 'gateway:http-request';
+
+const requestGateway = createGatewayRequestHandler({
+  apiBaseUrl: import.meta.env['VITE_GATEWAY_API_BASE_URL'],
+  requestTimeoutMs: import.meta.env['VITE_GATEWAY_REQUEST_TIMEOUT_MS'],
+});
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
@@ -32,6 +41,7 @@ const createWindow = (): void => {
 };
 
 app.whenReady().then(() => {
+  ipcMain.handle(GATEWAY_HTTP_CHANNEL, (_event, request: unknown) => requestGateway(request));
   createWindow();
 
   app.on('activate', () => {

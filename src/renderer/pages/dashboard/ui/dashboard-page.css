@@ -120,6 +120,11 @@
 
 .image-slot { display: flex; min-height: 100px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; overflow: hidden; border: 1px dashed rgb(206 189 255 / 30%); border-radius: 12px; background: linear-gradient(135deg, var(--plkit-panel-strong), var(--plkit-elevated)); color: var(--plkit-text-60); font-size: 12px; text-align: center; }
 .image-slot svg { color: var(--plkit-accent); }
+.image-slot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .segmented-control { display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: var(--plkit-panel-strong); }
 .segmented-control__button { padding: 6px 15px; border: 0; border-radius: 999px; background: transparent; color: var(--plkit-text-muted); font-size: 12px; font-weight: 600; cursor: pointer; }
