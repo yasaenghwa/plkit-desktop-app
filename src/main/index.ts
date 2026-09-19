@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'node:path';
 
 const createWindow = (): void => {
@@ -8,6 +8,8 @@ const createWindow = (): void => {
     useContentSize: true,
     minWidth: 960,
     minHeight: 640,
+    frame: false,
+    fullscreen: true,
     autoHideMenuBar: true,
     show: false,
     webPreferences: {
@@ -22,6 +24,13 @@ const createWindow = (): void => {
     mainWindow.show();
   });
 
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow.webContents.send('window:full-screen-changed', true);
+  });
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow.webContents.send('window:full-screen-changed', false);
+  });
+
   const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
   if (rendererUrl) {
     void mainWindow.loadURL(rendererUrl);
@@ -32,6 +41,21 @@ const createWindow = (): void => {
 };
 
 app.whenReady().then(() => {
+  ipcMain.on('window:minimize', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize();
+  });
+  ipcMain.on('window:close', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close();
+  });
+  ipcMain.on('window:toggle-full-screen', (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (window) window.setFullScreen(!window.isFullScreen());
+  });
+  ipcMain.handle(
+    'window:is-full-screen',
+    (event) => BrowserWindow.fromWebContents(event.sender)?.isFullScreen() ?? false,
+  );
+
   createWindow();
 
   app.on('activate', () => {

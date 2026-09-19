@@ -12,6 +12,7 @@ type GatewayTitleBarProps = {
 
 export const GatewayTitleBar = ({ onOpenEvents }: GatewayTitleBarProps): JSX.Element => {
   const [localTime, setLocalTime] = useState(() => formatLocalTime(new Date()));
+  const [isFullScreen, setIsFullScreen] = useState(true);
 
   useEffect(() => {
     const updateTime = (): void => setLocalTime(formatLocalTime(new Date()));
@@ -19,12 +20,36 @@ export const GatewayTitleBar = ({ onOpenEvents }: GatewayTitleBarProps): JSX.Ele
     return () => window.clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = window.windowControls.onFullScreenChange(setIsFullScreen);
+    void window.windowControls.isFullScreen().then(setIsFullScreen);
+    return unsubscribe;
+  }, []);
+
   return (
     <header className="gateway-titlebar">
-      <div aria-hidden="true" className="gateway-titlebar__window-controls">
-        <span className="gateway-titlebar__window-control gateway-titlebar__window-control--close" />
-        <span className="gateway-titlebar__window-control gateway-titlebar__window-control--minimize" />
-        <span className="gateway-titlebar__window-control gateway-titlebar__window-control--maximize" />
+      <div className="gateway-titlebar__window-controls">
+        <button
+          aria-label="창 닫기"
+          className="gateway-titlebar__window-control gateway-titlebar__window-control--close"
+          onClick={window.windowControls.close}
+          title="창 닫기"
+          type="button"
+        />
+        <button
+          aria-label="창 최소화"
+          className="gateway-titlebar__window-control gateway-titlebar__window-control--minimize"
+          onClick={window.windowControls.minimize}
+          title="창 최소화"
+          type="button"
+        />
+        <button
+          aria-label={isFullScreen ? '전체 화면 종료' : '전체 화면 시작'}
+          className="gateway-titlebar__window-control gateway-titlebar__window-control--maximize"
+          onClick={window.windowControls.toggleFullScreen}
+          title={isFullScreen ? '전체 화면 종료' : '전체 화면 시작'}
+          type="button"
+        />
       </div>
       <span className="gateway-titlebar__app-name">PLKIT Gateway — Electron</span>
       <div className="gateway-titlebar__status">
