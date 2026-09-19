@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { gatewayApi, getGatewayErrorMessage, type CameraImages } from '@entities/farm';
-import { GATEWAY_RUNTIME_CONFIG } from '@shared/config';
+import { getGatewayRuntimeConfig } from '@shared/config';
 import { DataRows, ImageSlot, PageTitle, Panel } from '@shared/ui';
 
 const TIMELINE_DAYS = [
@@ -76,7 +76,7 @@ export const CameraSection = ({ notify }: CameraSectionProps): JSX.Element => {
 
   const latest = images[0];
   const imageUrl = latest
-    ? new URL(latest.url, `${GATEWAY_RUNTIME_CONFIG.apiBaseUrl}/`).toString()
+    ? new URL(latest.url, `${getGatewayRuntimeConfig().apiBaseUrl}/`).toString()
     : undefined;
   const snapshot = latest?.snapshot;
 
@@ -111,7 +111,7 @@ export const CameraSection = ({ notify }: CameraSectionProps): JSX.Element => {
                     label={`Day ${entry.day}`}
                     source={
                       'url' in entry
-                        ? new URL(entry.url, `${GATEWAY_RUNTIME_CONFIG.apiBaseUrl}/`).toString()
+                        ? new URL(entry.url, `${getGatewayRuntimeConfig().apiBaseUrl}/`).toString()
                         : undefined
                     }
                   />

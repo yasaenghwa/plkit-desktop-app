@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { GatewaySettings } from '../../../../gateway-settings';
 import { gatewayApi, getGatewayErrorMessage, type SystemStatus } from '@entities/farm';
 import { GatewayTitleBar, Icon } from '@shared/ui';
 import { AssistantSection } from '@widgets/assistant';
@@ -13,6 +14,7 @@ import { OverviewSection } from '@widgets/overview';
 import { SystemSection } from '@widgets/system';
 
 import { NAVIGATION_ITEMS, type RouteId } from '../model/dashboard-navigation';
+import { ConnectionSettingsDialog } from './connection-settings-dialog';
 import './dashboard-page.css';
 
 type DashboardContentProps = {
@@ -73,12 +75,17 @@ const DashboardContent = ({
   }
 };
 
-export const DashboardPage = (): JSX.Element => {
+export const DashboardPage = ({
+  settings,
+}: {
+  readonly settings: GatewaySettings;
+}): JSX.Element => {
   const [route, setRoute] = useState<RouteId>('overview');
   const [historyTab, setHistoryTab] = useState<HistoryTab>('Sensor');
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const connectionErrorShownRef = useRef(false);
 
@@ -156,7 +163,11 @@ export const DashboardPage = (): JSX.Element => {
   return (
     <div className="dashboard-stage">
       <div className="dashboard-shell">
-        <GatewayTitleBar onOpenEvents={openEvents} />
+        <GatewayTitleBar
+          mode={settings.mode}
+          onOpenEvents={openEvents}
+          onOpenSettings={() => setSettingsOpen(true)}
+        />
         <div className="dashboard-body">
           <aside className="sidebar">
             <button className="brand" onClick={() => navigate('overview')} type="button">
@@ -177,7 +188,7 @@ export const DashboardPage = (): JSX.Element => {
               ))}
             </nav>
             <p className="sidebar__footer">
-              Gateway v0.2.0
+              PLKIT Desktop v1.0.0
               <br />
               Local First · Offline OK
             </p>
@@ -218,6 +229,9 @@ export const DashboardPage = (): JSX.Element => {
           </div>
         </div>
       </div>
+      {settingsOpen ? (
+        <ConnectionSettingsDialog onClose={() => setSettingsOpen(false)} settings={settings} />
+      ) : null}
       {toast ? (
         <div className="toast" role="status">
           {toast}

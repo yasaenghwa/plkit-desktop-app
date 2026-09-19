@@ -7,10 +7,16 @@ const BELL_ICON_PATH = 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9 M10.3 21a1.94 
 const formatLocalTime = (date: Date): string => date.toTimeString().slice(0, 5);
 
 type GatewayTitleBarProps = {
+  readonly mode: 'mock' | 'local';
+  readonly onOpenSettings: () => void;
   readonly onOpenEvents: () => void;
 };
 
-export const GatewayTitleBar = ({ onOpenEvents }: GatewayTitleBarProps): JSX.Element => {
+export const GatewayTitleBar = ({
+  mode,
+  onOpenEvents,
+  onOpenSettings,
+}: GatewayTitleBarProps): JSX.Element => {
   const [localTime, setLocalTime] = useState(() => formatLocalTime(new Date()));
   const [isFullScreen, setIsFullScreen] = useState(true);
 
@@ -62,10 +68,16 @@ export const GatewayTitleBar = ({ onOpenEvents }: GatewayTitleBarProps): JSX.Ele
           <Icon path={BELL_ICON_PATH} size={16} />
           <span aria-hidden="true">1</span>
         </button>
-        <span className="gateway-titlebar__connection">
+        <button
+          aria-label={`Gateway 연결 설정, 현재 ${mode === 'mock' ? 'Mock' : 'Local'} 모드`}
+          className="gateway-titlebar__connection"
+          onClick={onOpenSettings}
+          title="Gateway 연결 설정"
+          type="button"
+        >
           <span aria-hidden="true" />
-          Gateway Online
-        </span>
+          {mode === 'mock' ? 'Mock Gateway' : 'Local Gateway'}
+        </button>
         <time dateTime={localTime}>{localTime}</time>
       </div>
     </header>

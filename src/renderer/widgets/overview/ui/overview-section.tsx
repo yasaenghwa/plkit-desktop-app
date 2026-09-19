@@ -7,7 +7,7 @@ import {
   SENSORS,
   type Overview,
 } from '@entities/farm';
-import { GATEWAY_RUNTIME_CONFIG } from '@shared/config';
+import { getGatewayRuntimeConfig } from '@shared/config';
 import { Icon, ImageSlot, PageTitle, Panel } from '@shared/ui';
 import type { StatusTone } from '@shared/ui';
 
@@ -98,7 +98,7 @@ export const OverviewSection = ({
   const events =
     overview?.recentEvents ?? RECENT_EVENTS.map((event) => ({ at: event.time, ...event }));
   const latestImageUrl = overview?.latestImage
-    ? new URL(overview.latestImage.url, GATEWAY_RUNTIME_CONFIG.apiBaseUrl).toString()
+    ? new URL(overview.latestImage.url, getGatewayRuntimeConfig().apiBaseUrl).toString()
     : undefined;
 
   return (

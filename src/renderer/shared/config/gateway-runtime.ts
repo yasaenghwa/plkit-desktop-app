@@ -1,14 +1,4 @@
-import { z } from 'zod';
-
-const gatewayEnvironmentSchema = z
-  .object({
-    VITE_GATEWAY_API_BASE_URL: z.string().url(),
-    VITE_GATEWAY_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(8_000),
-    VITE_GATEWAY_WS_URL: z.string().url(),
-  })
-  .readonly();
-
-const environment = gatewayEnvironmentSchema.parse(import.meta.env);
+import { MOCK_GATEWAY_URLS, type GatewaySettings } from '../../../gateway-settings';
 
 export type GatewayRuntimeConfig = {
   readonly apiBaseUrl: string;
@@ -16,8 +6,20 @@ export type GatewayRuntimeConfig = {
   readonly wsUrl: string;
 };
 
-export const GATEWAY_RUNTIME_CONFIG: GatewayRuntimeConfig = {
-  apiBaseUrl: environment.VITE_GATEWAY_API_BASE_URL.replace(/\/$/, ''),
-  requestTimeoutMs: environment.VITE_GATEWAY_REQUEST_TIMEOUT_MS,
-  wsUrl: environment.VITE_GATEWAY_WS_URL,
+let runtimeConfig: GatewayRuntimeConfig = {
+  ...MOCK_GATEWAY_URLS,
+  requestTimeoutMs: 8_000,
 };
+
+export const initializeGatewayRuntime = (settings: GatewaySettings): void => {
+  runtimeConfig = {
+    apiBaseUrl:
+      settings.mode === 'mock'
+        ? MOCK_GATEWAY_URLS.apiBaseUrl
+        : settings.localApiBaseUrl.replace(/\/$/, ''),
+    wsUrl: settings.mode === 'mock' ? MOCK_GATEWAY_URLS.wsUrl : settings.localWsUrl,
+    requestTimeoutMs: 8_000,
+  };
+};
+
+export const getGatewayRuntimeConfig = (): GatewayRuntimeConfig => runtimeConfig;
