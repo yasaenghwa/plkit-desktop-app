@@ -40,23 +40,16 @@ npm run dev
 
 ## Gateway 연결 설정
 
-프로젝트 루트의 Git에서 제외된 `.env`에 실행 환경의 Gateway 주소를 입력합니다. 실제 주소는 저장소의 README나 소스 코드에 기록하지 않습니다.
+상단 바의 **Mock Gateway** 또는 **Local Gateway**를 누르면 연결 설정을 열 수 있습니다. 기본값은 시연용 Mock이며, 동일한 설치 앱에서 Local을 선택하고 저장하면 페이지가 다시 로드되면서 REST와 WebSocket 연결 대상이 함께 바뀝니다. 설정은 PC의 Electron 사용자 데이터 폴더에 저장되어 앱을 다시 실행해도 유지됩니다. 설정 변경에 소스 코드, `.env`, 개발 도구가 필요하지 않습니다.
 
-```dotenv
-VITE_GATEWAY_API_BASE_URL=<REST API base URL including /api/v1>
-VITE_GATEWAY_WS_ENABLED=false
-VITE_GATEWAY_WS_URL=<WebSocket URL>
-VITE_GATEWAY_REQUEST_TIMEOUT_MS=8000
-```
+| 모드         | REST API Base URL                                     | WebSocket URL                                   |
+| ------------ | ----------------------------------------------------- | ----------------------------------------------- |
+| Mock         | `https://plkit-gateway-simulator.onrender.com/api/v1` | `wss://plkit-gateway-simulator.onrender.com/ws` |
+| Local 기본값 | `http://localhost/api/v1`                             | `ws://localhost/ws`                             |
 
-- `VITE_GATEWAY_API_BASE_URL`: REST API의 `/api/v1`까지 포함한 base URL
-- `VITE_GATEWAY_WS_ENABLED`: WebSocket 연결 활성화 여부. 서버 구현 전에는 `false`
-- `VITE_GATEWAY_WS_URL`: Gateway Core WebSocket URL
-- `VITE_GATEWAY_REQUEST_TIMEOUT_MS`: REST 요청 제한 시간(ms)
+Local Gateway Core가 다른 포트에서 실행된다면 설정 창에서 REST와 WebSocket 주소를 각각 수정합니다(예: `http://localhost:8080/api/v1`, `ws://localhost:8080/ws`). Local 모드는 해당 PC에서 Gateway Core가 실행 중이고 브라우저 origin을 허용해야 실제 데이터가 표시됩니다. 개발 모드와 설치 앱의 origin이 다르므로 특히 설치 앱의 `file://` origin에 대한 CORS 정책을 백엔드와 확인해야 합니다. 연결 실패 시 화면은 유지되며 오류 토스트가 표시됩니다.
 
-Mock과 Local Gateway Core 전환은 `.env`의 REST 주소를 해당 환경 값으로 바꾼 뒤 `npm run dev`를 다시 시작하면 됩니다. 현재는 HTTP API 연결을 우선하며 WebSocket 코드는 후속 연동을 위해 유지하되 기본적으로 연결하지 않습니다. WebSocket 서버가 준비된 뒤 URL을 설정하고 `VITE_GATEWAY_WS_ENABLED=true`로 변경합니다. `VITE_` 변수는 빌드 결과에 포함될 수 있으므로 비밀번호나 토큰 같은 비밀값을 넣으면 안 됩니다.
-
-배포 환경별 값은 `shared/config/gateway-runtime.ts`에서 읽고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 한곳에 관리합니다. REST 요청은 Renderer의 `shared/api` HTTP 클라이언트가 직접 전송하므로 Gateway는 앱의 Renderer origin을 CORS 허용 목록에 포함해야 합니다. 개발 모드 요청은 DevTools Network 탭에서 확인할 수 있습니다.
+연결 대상은 `shared/config/gateway-runtime.ts`에서 적용하고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 관리합니다. REST 요청은 Renderer의 `shared/api` HTTP 클라이언트가 직접 전송합니다.
 
 개발 설정은 Electron 시작 전 호스트의 `ELECTRON_RUN_AS_NODE` 값을 제거합니다. 이 값이 설정되어 있으면 Electron이 main 프로세스를 일반 Node.js로 실행해 `BrowserWindow`를 사용할 수 없게 됩니다.
 
@@ -66,6 +59,7 @@ Mock과 Local Gateway Core 전환은 `.env`의 REST 주소를 해당 환경 값�
 | ---------------------- | ------------------------------------------------ |
 | `npm run dev`          | 개발 모드로 Electron 애플리케이션 실행           |
 | `npm run build`        | main, preload, renderer를 `out/`에 프로덕션 빌드 |
+| `npm run build:win`    | Windows x64 NSIS 설치 파일을 `dist/`에 생성      |
 | `npm run preview`      | 프로덕션 빌드를 로컬 Electron으로 실행           |
 | `npm run test`         | 로컬 HTTP 서버로 Gateway 연결·응답 계약 검사     |
 | `npm run typecheck`    | 파일을 생성하지 않고 엄격한 TypeScript 검사 수행 |
@@ -78,13 +72,18 @@ Mock과 Local Gateway Core 전환은 `.env`의 REST 주소를 해당 환경 값�
 ```text
 src/
 ├── main/
+│   ├── gateway-settings-store.ts # Gateway 설정 저장 및 검증
 │   └── index.ts       # Electron 생명 주기와 BrowserWindow 생성
 ├── preload/
-│   └── index.ts       # 필요 시 제한된 Electron API를 노출하는 진입점
+│   └── index.ts       # 제한된 창 제어 및 설정 API를 노출하는 진입점
 └── renderer/          # Node.js API에서 분리된 React 애플리케이션
 ```
 
-`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Preload가 노출한 제한된 창 제어 API로만 Electron 창을 제어합니다. Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
+`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Preload가 노출한 제한된 창 제어 및 Gateway 설정 API만 사용합니다. Gateway 설정은 main 프로세스에서 형식을 검증하고 저장합니다. Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
+
+## Windows 1.0.0 배포
+
+Windows에서 `npm ci`, `npm run typecheck`, `npm run test`, `npm run build:win` 순서로 실행합니다. 생성되는 `dist/PLKIT-Gateway-Setup-1.0.0-x64.exe`를 시연자에게 전달합니다. 설치 파일은 코드 서명이 없으므로 배포 전 신뢰할 수 있는 경로로 전달하고 Windows 보안 경고 및 설치 동작을 실제 배포 PC에서 확인해야 합니다. 자동 업데이트는 포함되지 않습니다.
 
 ## renderer FSD 구조
 
@@ -101,6 +100,7 @@ src/renderer/
 │       ├── model/
 │       │   └── dashboard-navigation.ts   # 화면 ID와 사이드바 메뉴 정의
 │       ├── ui/
+│       │   ├── connection-settings-dialog.tsx # Mock/Local 연결 설정
 │       │   ├── dashboard-page.css
 │       │   └── dashboard-page.tsx        # 레이아웃, 화면 전환, 공통 상태 관리
 │       └── index.ts
@@ -164,4 +164,4 @@ FSD는 `src/renderer`에만 적용합니다. `main`과 `preload`는 Electron 프
 
 ## 의도적으로 제외한 범위
 
-Gateway 내부 센서 수집, MQTT 처리, 데이터 영속화, 영상 스트리밍, Node-RED 연동, AI 모델 실행, 중앙 플랫폼 자체 구현, 배포 설치 파일, 코드 서명, 자동 업데이트, CI/CD는 이 프런트엔드 저장소의 범위에 포함하지 않습니다.
+Gateway 내부 센서 수집, MQTT 처리, 데이터 영속화, 영상 스트리밍, Node-RED 연동, AI 모델 실행, 중앙 플랫폼 자체 구현, 코드 서명, 자동 업데이트, CI/CD는 이 프런트엔드 저장소의 범위에 포함하지 않습니다.

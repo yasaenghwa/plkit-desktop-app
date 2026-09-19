@@ -1,5 +1,23 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+import { loadGatewaySettings, saveGatewaySettings } from './gateway-settings-store';
+
+const settingsPath = (): string => join(app.getPath('userData'), 'plkit', 'gateway-settings.json');
+const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
+const expectedRendererUrl = rendererUrl
+  ? new URL(rendererUrl).href
+  : pathToFileURL(join(__dirname, '../renderer/index.html')).href;
+
+const isAppWindow = (event: Electron.IpcMainInvokeEvent): boolean => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  return (
+    window !== null &&
+    event.senderFrame === window.webContents.mainFrame &&
+    event.senderFrame.url === expectedRendererUrl
+  );
+};
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
@@ -31,7 +49,6 @@ const createWindow = (): void => {
     mainWindow.webContents.send('window:full-screen-changed', false);
   });
 
-  const rendererUrl = process.env['ELECTRON_RENDERER_URL'];
   if (rendererUrl) {
     void mainWindow.loadURL(rendererUrl);
     return;
@@ -41,6 +58,18 @@ const createWindow = (): void => {
 };
 
 app.whenReady().then(() => {
+  ipcMain.handle('gateway-settings:load', (event) => {
+    if (!isAppWindow(event)) {
+      throw new Error('Gateway settings are available only to the app window.');
+    }
+    return loadGatewaySettings(settingsPath());
+  });
+  ipcMain.handle('gateway-settings:save', (event, value: unknown) => {
+    if (!isAppWindow(event)) {
+      throw new Error('Gateway settings are available only to the app window.');
+    }
+    return saveGatewaySettings(settingsPath(), value);
+  });
   ipcMain.on('window:minimize', (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize();
   });

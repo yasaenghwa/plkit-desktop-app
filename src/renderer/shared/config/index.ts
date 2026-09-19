@@ -1,2 +1,6 @@
 export { GATEWAY_ENDPOINTS } from './gateway-endpoints';
-export { GATEWAY_RUNTIME_CONFIG, type GatewayRuntimeConfig } from './gateway-runtime';
+export {
+  getGatewayRuntimeConfig,
+  initializeGatewayRuntime,
+  type GatewayRuntimeConfig,
+} from './gateway-runtime';

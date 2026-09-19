@@ -1,4 +1,4 @@
-import { GATEWAY_RUNTIME_CONFIG } from '@shared/config';
+import { getGatewayRuntimeConfig } from '@shared/config';
 
 import { createGatewayApi } from './gateway-api';
 
@@ -29,4 +29,4 @@ export type {
   SystemStatus,
 } from './operations-contracts';
 
-export const gatewayApi = createGatewayApi(GATEWAY_RUNTIME_CONFIG);
+export const gatewayApi = createGatewayApi(getGatewayRuntimeConfig());
