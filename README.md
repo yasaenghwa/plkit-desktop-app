@@ -36,6 +36,8 @@ npm run dev
 
 `npm run dev`는 Vite 렌더러 개발 서버를 시작하고 로컬 Electron 창을 엽니다. 창에는 **PLKIT Desktop Dashboard** 초기 화면이 표시됩니다.
 
+창은 운영체제 프레임 없이 전체 화면으로 시작합니다. 상단의 빨강·노랑·초록 버튼은 각각 닫기·최소화·전체 화면 전환이며, 초록 버튼으로 일반 창으로 돌아온 뒤에는 상단 바의 빈 영역을 드래그해 창을 이동할 수 있습니다.
+
 ## Gateway 연결 설정
 
 프로젝트 루트의 Git에서 제외된 `.env`에 실행 환경의 Gateway 주소를 입력합니다. 실제 주소는 저장소의 README나 소스 코드에 기록하지 않습니다.
@@ -82,7 +84,7 @@ src/
 └── renderer/          # Node.js API에서 분리된 React 애플리케이션
 ```
 
-`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
+`BrowserWindow`에는 `contextIsolation`과 `sandbox`를 활성화하고 `nodeIntegration`은 비활성화했습니다. 개발에서는 로컬 Vite 개발 서버만, 프로덕션에서는 생성된 로컬 HTML만 로드합니다. Renderer는 Node.js API를 직접 import하지 않으며, Preload가 노출한 제한된 창 제어 API로만 Electron 창을 제어합니다. Gateway REST 요청은 FSD `shared/api` 계층에서 브라우저 HTTP 요청으로 전송합니다.
 
 ## renderer FSD 구조
 

@@ -48,24 +48,41 @@
   padding: 0 16px;
   border-bottom: 1px solid var(--plkit-border);
   background: var(--plkit-chrome);
+  -webkit-app-region: drag;
+  user-select: none;
 }
 .gateway-titlebar__window-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  -webkit-app-region: no-drag;
 }
 .gateway-titlebar__window-control {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.gateway-titlebar__window-control::before {
+  content: '';
   width: 12px;
   height: 12px;
   border-radius: 50%;
 }
-.gateway-titlebar__window-control--close {
+.gateway-titlebar__window-control:hover::before {
+  filter: brightness(1.2);
+}
+.gateway-titlebar__window-control--close::before {
   background: var(--plkit-window-close);
 }
-.gateway-titlebar__window-control--minimize {
+.gateway-titlebar__window-control--minimize::before {
   background: var(--plkit-warning);
 }
-.gateway-titlebar__window-control--maximize {
+.gateway-titlebar__window-control--maximize::before {
   background: var(--plkit-window-maximize);
 }
 .gateway-titlebar__app-name {
@@ -82,6 +99,7 @@
   align-items: center;
   gap: 12px;
   margin-left: auto;
+  -webkit-app-region: no-drag;
 }
 .gateway-titlebar__notifications {
   position: relative;
