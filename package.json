@@ -1,12 +1,14 @@
 {
   "name": "plkit-desktop-dashboard",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "productName": "PLKIT Gateway",
   "description": "PLKIT smart-farm desktop dashboard foundation",
   "private": true,
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:win": "npm run build && electron-builder --win nsis --x64",
     "preview": "electron-vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -18,7 +20,6 @@
     "node": ">=20.0.0 <21"
   },
   "dependencies": {
-    "electron": "^33.4.11",
     "ky": "^1.7.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -30,6 +31,8 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^33.4.11",
+    "electron-builder": "26.0.12",
     "electron-vite": "^3.1.0",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
