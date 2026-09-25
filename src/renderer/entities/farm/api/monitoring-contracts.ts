@@ -32,7 +32,7 @@ const overviewActuatorSchema = z
     name: z.string(),
     state: z.string(),
     lastRunAt: z.string(),
-    lastRunDurationSec: z.number().int().nonnegative(),
+    lastRunDurationSec: z.number().int().nonnegative().nullable(),
   })
   .readonly();
 
@@ -97,7 +97,7 @@ export const deviceDetailSchema = z
         moduleClass: moduleClassSchema,
         moduleType: z.string(),
         moduleModel: z.string(),
-        hwRevision: z.number().int(),
+        hardwareRevision: z.number().int(),
         driverId: z.string(),
         firmware: z.string(),
         rssiDbm: z.number(),
@@ -201,7 +201,15 @@ export const cameraImagesSchema = z
                 airTemp: z.number(),
                 humidity: z.number(),
                 lightLx: z.number(),
-                lastControl: z.string(),
+                lastControl: z
+                  .object({
+                    deviceId: z.string(),
+                    command: z.string(),
+                    durationSec: z.number().int().nonnegative().nullable(),
+                    at: z.string(),
+                  })
+                  .readonly()
+                  .nullable(),
               })
               .readonly(),
           })

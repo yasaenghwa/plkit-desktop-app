@@ -41,8 +41,8 @@ export const networkStatusSchema = z
         ssid: z.string(),
         gatewayIp: z.string(),
         status: z.string(),
-        clients: z.number().int().nonnegative(),
-        dhcpRange: z.string(),
+        clients: z.number().int().nonnegative().nullable(),
+        dhcpRange: z.string().nullable(),
       })
       .readonly(),
     ble: z
@@ -125,9 +125,10 @@ export const actuatorHistorySchema = z
             deviceId: z.string(),
             command: z.string(),
             result: z.string(),
-            stateBefore: z.string(),
-            stateAfter: z.string(),
-            latencyMs: z.number().nonnegative(),
+            // null while unknown: no earlier state on the bus, or the command was never answered
+            stateBefore: z.string().nullable(),
+            stateAfter: z.string().nullable(),
+            latencyMs: z.number().nonnegative().nullable(),
             origin: z.string(),
           })
           .readonly(),
@@ -235,7 +236,7 @@ export const gatewaySocketEventSchema = z.union([
           moduleClass: z.string(),
           moduleType: z.string(),
           moduleModel: z.string(),
-          hwRevision: z.number().int(),
+          hardwareRevision: z.number().int(),
         })
         .readonly(),
     })

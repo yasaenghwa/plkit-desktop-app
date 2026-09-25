@@ -133,7 +133,12 @@ export const CameraSection = ({ notify }: CameraSectionProps): JSX.Element => {
               ['Air Temp', snapshot ? `${snapshot.airTemp} ℃` : '—'],
               ['Humidity', snapshot ? `${snapshot.humidity} %` : '—'],
               ['Light', snapshot ? `${snapshot.lightLx.toLocaleString()} lx` : '—'],
-              ['Last Control', snapshot?.lastControl ?? '—'],
+              [
+                'Last Control',
+                snapshot?.lastControl
+                  ? `${snapshot.lastControl.command} ${snapshot.lastControl.deviceId}${snapshot.lastControl.durationSec === null ? '' : ` · ${snapshot.lastControl.durationSec}s`}`
+                  : '—',
+              ],
             ]}
           />
           <p className="panel-note camera-context-note">

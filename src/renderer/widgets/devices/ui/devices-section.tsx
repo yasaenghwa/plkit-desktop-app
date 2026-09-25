@@ -36,7 +36,7 @@ const DEMO_DISCOVERED_DEVICE: DiscoveredDevice = {
   moduleClass: 'SENSOR',
   moduleType: 'SOIL_MOISTURE',
   moduleModel: 'PLKIT_SOIL_V1',
-  hwRevision: 1,
+  hardwareRevision: 1,
 };
 
 const displayCategory = (category: 'ACTUATOR' | 'CAMERA' | 'SENSOR'): DeviceFilter => {
@@ -150,7 +150,7 @@ export const DevicesSection = ({ notify }: DevicesSectionProps): JSX.Element => 
       ['module_class', detail?.hardware.moduleClass ?? selected.moduleClass],
       ['module_type', detail?.hardware.moduleType ?? selected.moduleType],
       ['module_model', detail?.hardware.moduleModel ?? '—'],
-      ['hw_revision', detail ? String(detail.hardware.hwRevision) : '—'],
+      ['hw_revision', detail ? String(detail.hardware.hardwareRevision) : '—'],
       ['driver_id', detail?.hardware.driverId ?? '—'],
       ['firmware', detail?.hardware.firmware ?? '—'],
       ['wi-fi rssi', detail ? `${detail.hardware.rssiDbm} dBm` : '—'],
