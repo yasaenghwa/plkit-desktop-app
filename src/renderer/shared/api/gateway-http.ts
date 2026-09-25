@@ -5,6 +5,8 @@ import { GatewayProblemError, problemDetailsSchema } from './problem-details';
 
 type RequestOptions = {
   readonly body?: unknown;
+  /** Sent instead of application/json, e.g. application/merge-patch+json for PATCH /devices/{id}/meta. */
+  readonly contentType?: string;
   readonly method?: 'get' | 'patch' | 'post';
   readonly searchParams?: URLSearchParams;
   readonly signal?: AbortSignal | undefined;
@@ -49,7 +51,14 @@ export const createGatewayHttpClient = (baseUrl: string, timeoutMs: number): Gat
       try {
         const requestOptions = {
           method: options.method ?? 'get',
-          ...(options.body === undefined ? {} : { json: options.body }),
+          ...(options.body === undefined
+            ? {}
+            : options.contentType === undefined
+              ? { json: options.body }
+              : {
+                  body: JSON.stringify(options.body),
+                  headers: { 'content-type': options.contentType },
+                }),
           ...(options.searchParams === undefined ? {} : { searchParams: options.searchParams }),
           ...(options.signal === undefined ? {} : { signal: options.signal }),
         };
