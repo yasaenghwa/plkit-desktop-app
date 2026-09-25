@@ -29,8 +29,8 @@ export type GatewaySettings = z.infer<typeof gatewaySettingsSchema>;
 
 export const DEFAULT_GATEWAY_SETTINGS: GatewaySettings = {
   mode: 'mock',
-  localApiBaseUrl: 'http://localhost/api/v1',
-  localWsUrl: 'ws://localhost/ws',
+  localApiBaseUrl: 'http://localhost:8000/api/v1',
+  localWsUrl: 'ws://localhost:8000/ws',
 };
 
 export const MOCK_GATEWAY_URLS = {
