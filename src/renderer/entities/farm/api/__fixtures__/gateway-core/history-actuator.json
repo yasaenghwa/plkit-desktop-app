@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "at": "2026-09-25T09:29:33.369Z",
+      "deviceId": "core-010",
+      "commandId": "cmd-1d9bcf",
+      "channelId": 1,
+      "command": "OFF",
+      "durationSec": null,
+      "origin": "USER",
+      "result": "SUCCESS",
+      "stateBefore": "ON",
+      "stateAfter": "OFF",
+      "latencyMs": 411,
+      "answeredAt": "2026-09-25T09:29:33.780Z"
+    },
+    {
+      "at": "2026-09-25T09:29:31.837Z",
+      "deviceId": "core-010",
+      "commandId": "cmd-72d916",
+      "channelId": 1,
+      "command": "ON",
+      "durationSec": null,
+      "origin": "USER",
+      "result": "SUCCESS",
+      "stateBefore": null,
+      "stateAfter": "ON",
+      "latencyMs": 411,
+      "answeredAt": "2026-09-25T09:29:32.248Z"
+    }
+  ],
+  "nextCursor": null,
+  "hasMore": false
+}

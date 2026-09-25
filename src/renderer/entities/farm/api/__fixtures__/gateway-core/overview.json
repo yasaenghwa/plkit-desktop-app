@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "gateway": "NORMAL",
+    "devices": {
+      "online": 5,
+      "total": 5,
+      "sensor": 3,
+      "actuatorCamera": 2
+    },
+    "cloudSync": {
+      "state": "ONLINE",
+      "lastSyncAt": "2026-09-25T09:21:29.031Z"
+    },
+    "alerts": 0
+  },
+  "environment": [
+    {
+      "deviceId": "core-001",
+      "moduleType": "AIR_TEMPERATURE",
+      "value": 23.8,
+      "unit": "Cel",
+      "health": "NORMAL",
+      "trend": "FLAT",
+      "measuredAt": "2026-09-25T09:21:28.551Z",
+      "name": "\ubca0\ub780\ub2e4 \uacf5\uae30 \uc628\uc2b5\ub3c4"
+    },
+    {
+      "deviceId": "core-001",
+      "moduleType": "AIR_HUMIDITY",
+      "value": 61.0,
+      "unit": "%",
+      "health": "NORMAL",
+      "trend": "FLAT",
+      "measuredAt": "2026-09-25T09:21:28.551Z",
+      "name": "\ubca0\ub780\ub2e4 \uacf5\uae30 \uc628\uc2b5\ub3c4"
+    },
+    {
+      "deviceId": "core-002",
+      "moduleType": "SOIL_MOISTURE",
+      "value": 42.37,
+      "unit": "%",
+      "health": "NORMAL",
+      "trend": "FLAT",
+      "measuredAt": "2026-09-25T09:21:28.551Z",
+      "name": "\ub85c\uba54\uc778 A \ud1a0\uc591\uc218\ubd84"
+    },
+    {
+      "deviceId": "core-003",
+      "moduleType": "LIGHT",
+      "value": 9200.0,
+      "unit": "lx",
+      "health": "NORMAL",
+      "trend": "FLAT",
+      "measuredAt": "2026-09-25T09:21:28.551Z",
+      "name": "\uc0dd\uc7a5 \uc870\ub3c4"
+    }
+  ],
+  "actuators": [
+    {
+      "deviceId": "core-010",
+      "channelId": 1,
+      "name": "\ub9b4\ub808\uc774 \ubcf4\ub4dc \u00b7 WATER_PUMP",
+      "state": "OFF",
+      "lastRunAt": "2026-09-25T09:21:28.554Z",
+      "lastRunDurationSec": null
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 2,
+      "name": "\ub9b4\ub808\uc774 \ubcf4\ub4dc \u00b7 FAN",
+      "state": "OFF",
+      "lastRunAt": "2026-09-25T09:21:28.554Z",
+      "lastRunDurationSec": null
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 3,
+      "name": "\ub9b4\ub808\uc774 \ubcf4\ub4dc \u00b7 GROW_LIGHT",
+      "state": "OFF",
+      "lastRunAt": "2026-09-25T09:21:28.554Z",
+      "lastRunDurationSec": null
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 4,
+      "name": "\ub9b4\ub808\uc774 \ubcf4\ub4dc \u00b7 VALVE",
+      "state": "OFF",
+      "lastRunAt": "2026-09-25T09:21:28.554Z",
+      "lastRunDurationSec": null
+    }
+  ],
+  "recentEvents": [],
+  "latestImage": {
+    "imageId": "img-0142",
+    "capturedAt": "2026-09-25T09:21:29.031Z",
+    "url": "/api/v1/cameras/images/img-0142/file"
+  }
+}

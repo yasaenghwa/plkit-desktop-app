@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "deviceId": "core-010",
+      "channelId": 1,
+      "channelType": "WATER_PUMP",
+      "state": "OFF",
+      "lastCommand": {
+        "commandId": "seed",
+        "command": "OFF",
+        "result": "SUCCESS",
+        "at": "2026-09-25T09:21:28.554Z"
+      }
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 2,
+      "channelType": "FAN",
+      "state": "OFF",
+      "lastCommand": {
+        "commandId": "seed",
+        "command": "OFF",
+        "result": "SUCCESS",
+        "at": "2026-09-25T09:21:28.554Z"
+      }
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 3,
+      "channelType": "GROW_LIGHT",
+      "state": "OFF",
+      "lastCommand": {
+        "commandId": "seed",
+        "command": "OFF",
+        "result": "SUCCESS",
+        "at": "2026-09-25T09:21:28.554Z"
+      }
+    },
+    {
+      "deviceId": "core-010",
+      "channelId": 4,
+      "channelType": "VALVE",
+      "state": "OFF",
+      "lastCommand": {
+        "commandId": "seed",
+        "command": "OFF",
+        "result": "SUCCESS",
+        "at": "2026-09-25T09:21:28.554Z"
+      }
+    }
+  ]
+}
