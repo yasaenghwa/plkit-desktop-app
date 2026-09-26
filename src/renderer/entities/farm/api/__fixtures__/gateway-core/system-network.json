@@ -1,0 +1,36 @@
+{
+  "ap": {
+    "ssid": "PLKIT-A82F19C4",
+    "gatewayIp": "192.168.50.1",
+    "status": "UNAVAILABLE",
+    "channel": 6,
+    "security": "WPA2_PSK",
+    "clients": null,
+    "dhcpRange": null,
+    "interface": "wlan0",
+    "band": "bg",
+    "applied": null,
+    "since": null,
+    "displaced": null,
+    "lastError": "nmcli-absent not found (NetworkManager required)",
+    "uplink": {
+      "wired": null,
+      "station": null
+    },
+    "channelConflict": null,
+    "uplinkWatch": {
+      "intervalSec": 30.0,
+      "lastCheckAt": null,
+      "lastAlignment": null
+    }
+  },
+  "ble": {
+    "beacon": "INACTIVE",
+    "gatewayId": "A82F19C4",
+    "advertising": "STOPPED",
+    "bootstrapVersion": 1,
+    "configRevision": 1,
+    "advType": "broadcast",
+    "intervalMs": 1000
+  }
+}

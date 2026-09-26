@@ -194,6 +194,7 @@ export const createGatewayApi = (config: GatewayRuntimeConfig) => {
       updateMeta: (deviceId: string, input: DeviceMetadataInput, signal?: AbortSignal) =>
         http.request(GATEWAY_ENDPOINTS.deviceMeta(deviceId), deviceMetaSchema, {
           body: input,
+          contentType: 'application/merge-patch+json',
           method: 'patch',
           signal,
         }),

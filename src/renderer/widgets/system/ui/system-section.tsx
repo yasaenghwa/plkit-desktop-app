@@ -84,7 +84,7 @@ const NetworkPanel = ({ data }: { readonly data: NetworkStatus | null }): JSX.El
           ['SSID', data?.ap.ssid ?? '—'],
           ['Gateway IP', data?.ap.gatewayIp ?? '—'],
           ['Status', data?.ap.status ?? '—'],
-          ['Clients', data ? String(data.ap.clients) : '—'],
+          ['Clients', data?.ap.clients == null ? '—' : String(data.ap.clients)],
           ['DHCP Range', data?.ap.dhcpRange ?? '—'],
         ]}
       />

@@ -31,8 +31,9 @@ const overviewActuatorSchema = z
     deviceId: z.string(),
     name: z.string(),
     state: z.string(),
-    lastRunAt: z.string(),
-    lastRunDurationSec: z.number().int().nonnegative(),
+    // null: the last command was OFF, or nothing ever switched it on (SSOT v2)
+    lastRunAt: z.string().nullable(),
+    lastRunDurationSec: z.number().int().nonnegative().nullable(),
   })
   .readonly();
 
@@ -97,7 +98,7 @@ export const deviceDetailSchema = z
         moduleClass: moduleClassSchema,
         moduleType: z.string(),
         moduleModel: z.string(),
-        hwRevision: z.number().int(),
+        hardwareRevision: z.number().int(),
         driverId: z.string(),
         firmware: z.string(),
         rssiDbm: z.number(),
@@ -201,7 +202,15 @@ export const cameraImagesSchema = z
                 airTemp: z.number(),
                 humidity: z.number(),
                 lightLx: z.number(),
-                lastControl: z.string(),
+                lastControl: z
+                  .object({
+                    deviceId: z.string(),
+                    command: z.string(),
+                    durationSec: z.number().int().nonnegative().nullable(),
+                    at: z.string(),
+                  })
+                  .readonly()
+                  .nullable(),
               })
               .readonly(),
           })

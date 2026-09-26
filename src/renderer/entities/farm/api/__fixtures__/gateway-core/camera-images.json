@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "imageId": "img-0142",
+      "day": 18,
+      "capturedAt": "2026-09-26T11:49:49.694Z",
+      "url": "/api/v1/cameras/images/img-0142/file",
+      "snapshot": {
+        "soil": 42.37,
+        "airTemp": 23.8,
+        "humidity": 61.0,
+        "lightLx": 9200,
+        "lastControl": {
+          "deviceId": "pump-001",
+          "command": "RUN",
+          "durationSec": 10,
+          "at": "2026-09-26T11:49:49.694Z"
+        }
+      }
+    }
+  ],
+  "nextCursor": "img-0122",
+  "hasMore": true
+}

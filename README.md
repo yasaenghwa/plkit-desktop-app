@@ -45,9 +45,18 @@ npm run dev
 | 모드         | REST API Base URL                                     | WebSocket URL                                   |
 | ------------ | ----------------------------------------------------- | ----------------------------------------------- |
 | Mock         | `https://plkit-gateway-simulator.onrender.com/api/v1` | `wss://plkit-gateway-simulator.onrender.com/ws` |
-| Local 기본값 | `http://localhost/api/v1`                             | `ws://localhost/ws`                             |
+| Local 기본값 | `http://localhost:8000/api/v1`                        | `ws://localhost:8000/ws`                        |
 
-Local Gateway Core가 다른 포트에서 실행된다면 설정 창에서 REST와 WebSocket 주소를 각각 수정합니다(예: `http://localhost:8080/api/v1`, `ws://localhost:8080/ws`). Local 모드는 해당 PC에서 Gateway Core가 실행 중이고 브라우저 origin을 허용해야 실제 데이터가 표시됩니다. 개발 모드와 설치 앱의 origin이 다르므로 특히 설치 앱의 `file://` origin에 대한 CORS 정책을 백엔드와 확인해야 합니다. 연결 실패 시 화면은 유지되며 오류 토스트가 표시됩니다.
+Local 기본값은 [plkit-gateway-core](https://github.com/yasaenghwa/plkit-gateway-core)의 기본 포트 8000입니다. 같은 PC에서 실행할 때:
+
+```bash
+uv run uvicorn app.main:app --port 8000                  # 같은 PC
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000   # 다른 PC(예: Raspberry Pi)에서 실행하고 이 앱이 LAN으로 붙을 때
+```
+
+다른 PC나 다른 포트면 설정 창에서 REST와 WebSocket 주소를 각각 수정합니다(예: `http://192.168.0.12:8000/api/v1`, `ws://192.168.0.12:8000/ws`). gateway-core는 CORS를 모든 origin에 허용하므로 개발 모드와 설치 앱(`file://`, 요청 Origin `null`) 모두 그대로 붙습니다(REST, `PATCH` preflight, WebSocket 확인). 연결 실패 시 화면은 유지되며 오류 토스트가 표시됩니다.
+
+REST/WS 계약의 원본은 Confluence `PLKIT` 스페이스의 [HTTP/WS Endpoints](https://yasaenghwa.atlassian.net/wiki/spaces/PLKIT/pages/12320771/HTTP+WS+Endpoints)(v2, 2026-09-26)다. 응답은 zod 스키마로 검증하므로 필드 이름·타입이 gateway-core와 조금만 달라도 연결 실패처럼 보입니다. `entities/farm/api/gateway-contract.test.ts`가 gateway-core에서 녹화한 실제 응답(`__fixtures__/gateway-core/`)으로 이를 검사합니다. gateway-core 응답이 바뀌면 픽스처를 다시 녹화합니다.
 
 연결 대상은 `shared/config/gateway-runtime.ts`에서 적용하고, 고정 API 경로는 `shared/config/gateway-endpoints.ts`에서 관리합니다. REST 요청은 Renderer의 `shared/api` HTTP 클라이언트가 직접 전송합니다.
 

@@ -111,9 +111,9 @@ const ActuatorHistory = ({ data }: { readonly data: ActuatorHistoryData | null }
               {item.result}
             </b>
             <span>
-              {item.stateBefore} → {item.stateAfter}
+              {item.stateBefore ?? '—'} → {item.stateAfter ?? '—'}
             </span>
-            <small>{item.latencyMs.toLocaleString()} ms</small>
+            <small>{item.latencyMs === null ? '—' : `${item.latencyMs.toLocaleString()} ms`}</small>
           </div>
         ))
       : ACTUATOR_ROWS.map(([time, device, command, result, state, latency]) => (
