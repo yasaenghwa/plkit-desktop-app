@@ -93,9 +93,11 @@ export const OverviewSection = ({
         name: actuator.name,
         state: actuator.state,
         note:
-          actuator.lastRunDurationSec === null
-            ? `Last run ${new Date(actuator.lastRunAt).toLocaleTimeString()}`
-            : `Last run ${new Date(actuator.lastRunAt).toLocaleTimeString()} · ${actuator.lastRunDurationSec} sec`,
+          actuator.lastRunAt === null
+            ? 'Last run —'
+            : actuator.lastRunDurationSec === null
+              ? `Last run ${new Date(actuator.lastRunAt).toLocaleTimeString()}`
+              : `Last run ${new Date(actuator.lastRunAt).toLocaleTimeString()} · ${actuator.lastRunDurationSec} sec`,
       }))
     : ACTUATORS.map(([name, state, note]) => ({ name, state, note }));
   const events =

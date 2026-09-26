@@ -31,7 +31,8 @@ const overviewActuatorSchema = z
     deviceId: z.string(),
     name: z.string(),
     state: z.string(),
-    lastRunAt: z.string(),
+    // null: the last command was OFF, or nothing ever switched it on (SSOT v2)
+    lastRunAt: z.string().nullable(),
     lastRunDurationSec: z.number().int().nonnegative().nullable(),
   })
   .readonly();
