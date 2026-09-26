@@ -3,7 +3,7 @@
     {
       "imageId": "img-0142",
       "day": 18,
-      "capturedAt": "2026-09-25T09:21:29.540Z",
+      "capturedAt": "2026-09-26T11:49:49.694Z",
       "url": "/api/v1/cameras/images/img-0142/file",
       "snapshot": {
         "soil": 42.37,
@@ -14,7 +14,7 @@
           "deviceId": "pump-001",
           "command": "RUN",
           "durationSec": 10,
-          "at": "2026-09-25T09:21:29.540Z"
+          "at": "2026-09-26T11:49:49.694Z"
         }
       }
     }

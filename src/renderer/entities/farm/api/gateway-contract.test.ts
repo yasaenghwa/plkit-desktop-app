@@ -1,5 +1,5 @@
 /**
- * The app against responses recorded from gateway-core (develop 0949648 / 88c7693 for history-actuator, PLKIT-69).
+ * The app against responses recorded from gateway-core (develop 284aeeb, SSOT v2 — Confluence HTTP/WS Endpoints).
  * Each fixture is what the gateway really sends, so a schema that drifts from the gateway
  * fails here instead of in front of a user as "cannot connect".
  */
@@ -95,10 +95,12 @@ afterAll(
 );
 
 describe('gateway-core contract', () => {
-  it('accepts an actuator that has never run (lastRunDurationSec null)', async () => {
+  it('reads when an actuator last ran, null when it never did', async () => {
     const overview = await api.overview.get();
-    expect(overview.actuators.length).toBeGreaterThan(0);
-    expect(overview.actuators.every((a) => a.lastRunDurationSec === null)).toBe(true);
+    const [pump, ...rest] = overview.actuators;
+    expect(pump?.lastRunAt).not.toBeNull();
+    expect(pump?.lastRunDurationSec).toBe(1);
+    expect(rest.every((a) => a.lastRunAt === null && a.lastRunDurationSec === null)).toBe(true);
   });
 
   it('accepts an inactive AP (clients and dhcpRange null)', async () => {
@@ -120,9 +122,10 @@ describe('gateway-core contract', () => {
     ).toBe(true);
   });
 
-  it('accepts actuator history with unknown before-state or latency (null)', async () => {
+  it('accepts actuator history with unknown before-state (null)', async () => {
     const history = await api.history.actuator();
     expect(history.items.map((i) => [i.command, i.stateBefore, i.stateAfter])).toEqual([
+      ['RUN', 'OFF', 'OFF'],
       ['OFF', 'ON', 'OFF'],
       ['ON', null, 'ON'],
     ]);

@@ -1,9 +1,23 @@
 {
   "items": [
     {
-      "at": "2026-09-25T09:29:33.369Z",
+      "at": "2026-09-26T11:49:46.661Z",
       "deviceId": "core-010",
-      "commandId": "cmd-1d9bcf",
+      "commandId": "cmd-2df8a5",
+      "channelId": 1,
+      "command": "RUN",
+      "durationSec": 1,
+      "origin": "USER",
+      "result": "SUCCESS",
+      "stateBefore": "OFF",
+      "stateAfter": "OFF",
+      "latencyMs": 412,
+      "answeredAt": "2026-09-26T11:49:48.076Z"
+    },
+    {
+      "at": "2026-09-26T11:49:45.114Z",
+      "deviceId": "core-010",
+      "commandId": "cmd-53547d",
       "channelId": 1,
       "command": "OFF",
       "durationSec": null,
@@ -11,13 +25,13 @@
       "result": "SUCCESS",
       "stateBefore": "ON",
       "stateAfter": "OFF",
-      "latencyMs": 411,
-      "answeredAt": "2026-09-25T09:29:33.780Z"
+      "latencyMs": 412,
+      "answeredAt": "2026-09-26T11:49:45.525Z"
     },
     {
-      "at": "2026-09-25T09:29:31.837Z",
+      "at": "2026-09-26T11:49:43.561Z",
       "deviceId": "core-010",
-      "commandId": "cmd-72d916",
+      "commandId": "cmd-a43b69",
       "channelId": 1,
       "command": "ON",
       "durationSec": null,
@@ -26,7 +40,7 @@
       "stateBefore": null,
       "stateAfter": "ON",
       "latencyMs": 411,
-      "answeredAt": "2026-09-25T09:29:32.248Z"
+      "answeredAt": "2026-09-26T11:49:43.972Z"
     }
   ],
   "nextCursor": null,
